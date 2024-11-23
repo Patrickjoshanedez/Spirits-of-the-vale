@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import javax.imageio.ImageIO;
 import main.GamePanel;
+import main.UtilityTool;
 
 public class TileManager {
 
@@ -25,27 +26,38 @@ public class TileManager {
     }
 
     public void getTileImage() {
-        try {
-            for (int i = 0; i < tile.length; i++) {
-                tile[i] = new Tile();
-                tile[i].image = ImageIO.read(getClass().getResourceAsStream("/tiles/" + String.format("%03d", i) + ".png"));
+        for (int i = 0; i < 155; i++) {
+            String imagePath = String.format("%03d", i);
+            boolean collision = (i >= 1 && i <= 39) || 
+                                (i >= 59 && i <= 69) || 
+                                (i == 71) || 
+                                (i >= 73 && i <= 75) || 
+                                (i >= 77 && i <= 78) || 
+                                (i >= 80 && i <= 83) || 
+                                (i == 92) || 
+                                (i >= 93 && i <= 94) || 
+                                (i >= 99 && i <= 106) || 
+                                (i == 109) || 
+                                (i >= 111 && i <= 133) || 
+                                (i == 142) || 
+                                (i == 151);
 
-                // Set collision for specific tiles based on their index
-                if ((i >= 1 && i <= 39) || // 001 to 039
-                    (i >= 59 && i <= 69) || // 059 to 069
-                    (i == 71) || // 071
-                    (i >= 73 && i <= 75) || // 073 to 075
-                    (i >= 77 && i <= 78) || // 077 to 078
-                    (i >= 80 && i <= 83) || // 080 to 083
-                    (i == 92) || // 092
-                    (i >= 93 && i <= 94) || // 093 to 094
-                    (i >= 99 && i <= 106) || // 099 to 106
-                    (i == 109) || // 109
-                    (i >= 111 && i <= 133) || // 111 to 133
-                    (i == 142) || // 142
-                    (i == 151)) {
-                    tile[i].collision = true;
-                }
+            setup(i, imagePath, collision);
+        }
+    }
+
+    public void setup(int index, String imageName, boolean collision) {
+        UtilityTool uTool = new UtilityTool();
+
+        try {
+            tile[index] = new Tile();
+            tile[index].image = ImageIO.read(getClass().getResourceAsStream("/tiles/" + imageName + ".png"));
+            
+            if (tile[index].image == null) {
+                System.out.println("Failed to load image for tile index: " + index + " Image path: /tiles/" + imageName + ".png");
+            } else {
+                tile[index].image = uTool.scaleImage(tile[index].image, gp.tileSize, gp.tileSize);
+                tile[index].collision = collision;
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -53,27 +65,24 @@ public class TileManager {
     }
 
     public void loadMap(String filePath) {
-        try {
-            InputStream is = getClass().getResourceAsStream(filePath);
-            BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        try (InputStream is = getClass().getResourceAsStream(filePath);
+             BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
 
             int row = 0;
 
             while (row < gp.maxWorldRow) {
                 String line = br.readLine();
 
-                if (line == null) break; // Check for end of file
+                if (line == null) break;
 
                 String numbers[] = line.split(" ");
 
-                // Ensure we don't exceed the max columns
                 for (int col = 0; col < gp.maxWorldCol && col < numbers.length; col++) {
                     int num = Integer.parseInt(numbers[col]);
 
-                    // Validate the tile number
                     if (num < 0 || num >= tile.length) {
                         System.out.println("Invalid tile number: " + num + " at row: " + row + " col: " + col);
-                        mapTileNum[col][row] = 0; // Use tile index 0 as a default (assuming it's a valid tile)
+                        mapTileNum[col][row] = 0; // Use tile index 0 as a default
                     } else {
                         mapTileNum[col][row] = num;
                     }
@@ -81,9 +90,10 @@ public class TileManager {
 
                 row++;
             }
-            br.close();
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
+        } catch (NumberFormatException e) {
+            System.out.println("Error parsing tile number in map file: " + e.getMessage());
         }
     }
 
@@ -102,7 +112,7 @@ public class TileManager {
                 worldY + gp.tileSize > gp.player.worldY - gp.player.screenY &&
                 worldY - gp.tileSize < gp.player.worldY + gp.player.screenY) {
                 
-                g2.drawImage(tile[tileNum].image, screenX, screenY, gp.tileSize, gp.tileSize, null);
+                g2.drawImage(tile[tileNum].image, screenX, screenY, null);
             }
             
             worldCol++;
