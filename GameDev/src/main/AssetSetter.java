@@ -30,9 +30,5 @@ public class AssetSetter {
         gp.npc[0].worldX = gp.tileSize * 10;
         gp.npc[0].worldY = gp.tileSize * 2;
 
-        // Initialize more NPCs if needed
-        gp.npc[1] = new NPC_Mage1(gp); // For example, another NPC
-        gp.npc[1].worldX = gp.tileSize * 12; // Set position
-        gp.npc[1].worldY = gp.tileSize * 3; // Set position
     }
 }

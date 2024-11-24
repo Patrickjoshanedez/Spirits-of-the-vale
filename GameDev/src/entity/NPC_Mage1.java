@@ -11,8 +11,9 @@ public class NPC_Mage1 extends Entity{
 	public NPC_Mage1(GamePanel gp) {
 	    super(gp);
 	    direction = "left";
-	    speed = 2;
+	    speed = 1;
 	    getPlayerImage(); // Load NPC images
+	    setDialogue();
 	}
 	public void getPlayerImage() {
         up1 = setup("/npc/npc_up1");
@@ -28,6 +29,13 @@ public class NPC_Mage1 extends Entity{
         right2 = setup("/npc/npc_right2");
         right3 = setup("/npc/npc_right3");
     }
+	public void setDialogue() {
+		
+		dialogue[0] = "Greetings, dear warrior!";
+		dialogue[1] = "I'm the chief in this side of town \nHAHAHAHAHAHAHAHA";
+		dialogue[2] = "Can i ask you a favor?";
+		dialogue[3] = "please lick my ballz";
+	}
 
 	public void setAction(){
 		actionLockCounter ++;
@@ -51,5 +59,7 @@ public class NPC_Mage1 extends Entity{
 		actionLockCounter = 0;
 		}
 	}
-	
+	public void speak() {
+		super.speak();
+	}
 }

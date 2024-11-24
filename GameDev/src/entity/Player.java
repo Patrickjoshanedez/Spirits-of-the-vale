@@ -109,6 +109,7 @@ public class Player extends Entity {
                 spriteCounter = 0;
             }
         }
+        System.out.println("Player update called. Game state: " + gp.gameState);
     }
 
     public void pickUpObject(int i) {
@@ -118,10 +119,20 @@ public class Player extends Entity {
         }
     }
     public void interactNPC(int i) {
-    	if (i != 999) {
-      
-     
+        if(i != 999) {
+        	
+        	if (gp.keyH.enterPressed == true) {
+                // If the index is valid, proceed to interact with the NPC
+                gp.gameState = gp.dialogueState; // Change game state to dialogue
+                gp.npc[i].speak(); // Call the speak method on the NPC
+            } else {
+                // Handle the case where the index is out of bounds
+                System.out.println("You're hitting the npc!");
+            }
+        	
         }
+        gp.keyH.enterPressed = false;
+        
     }
 
     public void draw(Graphics2D g2) {
