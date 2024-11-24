@@ -3,14 +3,18 @@ package main;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontFormatException;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.DecimalFormat;
 
 public class UI {
 
     GamePanel gp;
     Graphics2D g2;
-    Font arial_40, arial_80B;
+    Font upheavtt;
     public boolean messageOn = false;
     public String message = "";
     int messageCounter = 0;
@@ -23,8 +27,15 @@ public class UI {
     public UI(GamePanel gp) {
         this.gp = gp;
 
-        arial_40 = new Font("Arial", Font.ITALIC, 40);
-        arial_80B = new Font("Arial", Font.BOLD, 80);
+
+       try {
+           InputStream is = getClass().getResourceAsStream("/font/upheavtt.ttf");
+		upheavtt = Font.createFont(Font.TRUETYPE_FONT, is);
+	} catch (FontFormatException e) {
+		e.printStackTrace();
+	} catch (IOException e) {
+		e.printStackTrace();
+	}
     }
 
     public void showMessage(String text) {
@@ -34,8 +45,9 @@ public class UI {
 
     public void draw(Graphics2D g2) {
     	this.g2 = g2;
-
-        g2.setFont(arial_40);
+    	
+    	g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+    	g2.setFont(upheavtt);
         g2.setColor(Color.white);
 
         if (gp.gameState == gp.playState) {
@@ -63,7 +75,7 @@ public class UI {
         // Draw the background rectangle for the dialogue box
         drawSubWindow(x, y, width, height);
         
-        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 28));
+        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 25));
         x += gp.tileSize; // Adjust x position for padding
         y += gp.tileSize; // Adjust y position for padding
         
@@ -79,7 +91,7 @@ public class UI {
     
     public void drawSubWindow(int x, int y, int width, int height) {
         // Draw the background
-        Color backgroundColor = new Color(0, 0, 0, 150); // Black color for the background
+        Color backgroundColor = new Color(0, 0, 0, 190); // Black color for the background
         g2.setColor(backgroundColor);
         g2.fillRoundRect(x, y, width, height, 35, 35); // Draw a rounded rectangle for the background
 

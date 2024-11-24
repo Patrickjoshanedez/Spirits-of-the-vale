@@ -14,6 +14,10 @@ public class Player extends Entity {
     public final int screenY;
     int standCounter = 0;
 
+    // Health attributes
+    private int health; // Current health
+    public int maxHealth = 100; // Maximum health
+
     public Player(GamePanel gp, KeyHandler keyH) {
         super(gp);
         this.keyH = keyH;
@@ -31,6 +35,7 @@ public class Player extends Entity {
 
         setDefaultValues();
         getPlayerImage();
+        this.health = maxHealth; // Initialize health
     }
 
     public void setDefaultValues() {
@@ -55,6 +60,15 @@ public class Player extends Entity {
         right3 = setup("/player/right3");
     }
 
+    public int getHealth() {
+        return health;
+    }
+
+    public void takeDamage(int damage) {
+        health -= damage;
+        if (health < 0) health = 0; // Prevent negative health
+    }
+
     public void update() {
         if (keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed) {
             if (keyH.upPressed) {
@@ -77,7 +91,7 @@ public class Player extends Entity {
             int objIndex = gp.cChecker.checkObject(this, true);
             pickUpObject(objIndex);
             
-            //check NPC collision
+            // Check NPC collision
             int npcIndex = gp.cChecker.checkEntity(this, gp.npc);
             interactNPC(npcIndex);
 
@@ -118,10 +132,10 @@ public class Player extends Entity {
             // For example: gp.obj[i].interact(); or similar
         }
     }
+
     public void interactNPC(int i) {
-        if(i != 999) {
-        	
-        	if (gp.keyH.enterPressed == true) {
+        if (i != 999) {
+            if (gp.keyH.enterPressed) {
                 // If the index is valid, proceed to interact with the NPC
                 gp.gameState = gp.dialogueState; // Change game state to dialogue
                 gp.npc[i].speak(); // Call the speak method on the NPC
@@ -129,10 +143,8 @@ public class Player extends Entity {
                 // Handle the case where the index is out of bounds
                 System.out.println("You're hitting the npc!");
             }
-        	
         }
         gp.keyH.enterPressed = false;
-        
     }
 
     public void draw(Graphics2D g2) {
