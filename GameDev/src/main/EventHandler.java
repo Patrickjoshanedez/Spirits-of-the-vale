@@ -1,3 +1,4 @@
+
 package main;
 
 import java.awt.Rectangle;
@@ -26,7 +27,7 @@ public class EventHandler {
 
     public void checkEvent() {
         // Check for pit damage event
-        if (hit(4, 1, "right")) {
+        if (hit(4, 1, "up")) {
             if (canTakeDamage) {
                 damagePit(gp.dialogueState);
                 canTakeDamage = false;
