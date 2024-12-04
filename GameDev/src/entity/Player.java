@@ -43,6 +43,9 @@ public class Player extends Entity {
         worldY = gp.tileSize * 3;   // Starting Y position
         speed = 4;                   // Movement speed
         direction = "down";          // Default direction
+        // PLAYER STATUS
+        maxLife = 6;
+        life = maxLife;
     }
 
     public void getPlayerImage() {
@@ -58,15 +61,6 @@ public class Player extends Entity {
         right1 = setup("/player/right1");
         right2 = setup("/player/right2");
         right3 = setup("/player/right3");
-    }
-
-    public int getHealth() {
-        return health;
-    }
-
-    public void takeDamage(int damage) {
-        health -= damage;
-        if (health < 0) health = 0; // Prevent negative health
     }
 
     public void update() {
@@ -94,7 +88,10 @@ public class Player extends Entity {
             // Check NPC collision
             int npcIndex = gp.cChecker.checkEntity(this, gp.npc);
             interactNPC(npcIndex);
-
+            
+            //CHECK EVENT
+            gp.eHandler.checkEvent();
+            
             // If no collision, move the player
             if (!collisionOn) {
                 switch (direction) {

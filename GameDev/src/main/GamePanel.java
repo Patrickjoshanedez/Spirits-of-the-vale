@@ -40,6 +40,7 @@ public class GamePanel extends JPanel implements Runnable {
     public CollisionChecker cChecker = new CollisionChecker(this);
     public AssetSetter aSetter = new AssetSetter(this);
     public UI ui = new UI(this);
+    public EventHandler eHandler = new EventHandler(this);
     Thread gameThread;
     
     // ENTITY and OBJECT
@@ -49,9 +50,11 @@ public class GamePanel extends JPanel implements Runnable {
     
     // GAME STATE    
     public int gameState;
+    public final int titleState = 0;
     public final int playState = 1;
     public final int pauseState = 2;
     public final int dialogueState = 3;
+    public final int battleState = 4;
     
     // Set player's default position
     int playerX = 100;
@@ -67,10 +70,15 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public void setUpGame() {
-        aSetter.setObject(); // Make sure this method initializes obj
-        aSetter.setNPC();
-        playMusic(0);
-        gameState = playState;
+        aSetter.setObject(); // Ensure objects are initialized
+        aSetter.setNPC(); // Ensure NPCs are initialized
+        if (obj[0] == null) {
+            System.err.println("Warning: No objects initialized!");
+        }
+        if (npc[0] == null) {
+            System.err.println("Warning: No NPCs initialized!");
+        }
+        gameState = titleState; // Ensure the title state is set initially
     }
 
     public void startGameThread() {
@@ -115,37 +123,45 @@ public class GamePanel extends JPanel implements Runnable {
                     npc[i].update();
                 }
             }
+
         }
     }
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
- Graphics2D g2 = (Graphics2D) g;
+        Graphics2D g2 = (Graphics2D) g;
 
-        // TILE
-        tileM.draw(g2);
+        if (gameState == titleState) {
+            ui.draw(g2); // Draw title screen
+        } else {
+            // TILE
+            tileM.draw(g2);
 
-        // OBJECT
-        for (int i = 0; i < obj.length; i++) {
-            if (obj[i] != null) {
-                obj[i].draw(g2, this);
+            // OBJECT
+            for (SuperObjects object : obj) {
+                if (object != null) {
+                    object.draw(g2, this);
+                }
             }
-        }
 
-        // NPC
-        for (int i = 0; i < npc.length; i++) {
-            if (npc[i] != null) {
-                npc[i].draw(g2);
+            // NPC
+            for (Entity entity : npc) {
+                if (entity != null) {
+                    entity.draw(g2);
+                }
             }
+
+            // PLAYER
+            player.draw(g2);
+
+            // UI
+            ui.draw(g2);
         }
-
-        // PLAYER
-        player.draw(g2);
-
-        // UI
-        ui.draw(g2);
         g2.dispose();
     }
+    
+
+
 
     public void playMusic(int i) {
         music.setFile(i);

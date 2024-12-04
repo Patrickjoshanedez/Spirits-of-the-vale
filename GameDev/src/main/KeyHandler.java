@@ -19,6 +19,43 @@ public class KeyHandler implements KeyListener {
 	public void keyPressed(KeyEvent e) {
 		
 		int code = e.getKeyCode();
+		// Title state
+		if (gp.gameState == gp.titleState) {
+			
+			if(gp.ui.titleScreenState == 0) {
+				if (code == KeyEvent.VK_W) { // Navigate up
+			        gp.ui.commandNum--;
+			        if (gp.ui.commandNum < 0) {
+			            gp.ui.commandNum = 2; // Wrap to the last menu option
+			        }
+			    }
+
+			    if (code == KeyEvent.VK_S) { // Navigate down
+			        gp.ui.commandNum++;
+			        if (gp.ui.commandNum > 2) {
+			            gp.ui.commandNum = 0; // Wrap to the first menu option
+			        }
+			    }
+
+			    if (code == KeyEvent.VK_ENTER) { // Execute the selected option
+			    	if (gp.ui.commandNum == 0) { // "New Game" selected
+			    	    gp.setUpGame(); // Ensure game setup
+			    	    gp.gameState = gp.playState; // Switch to play state
+			    	    gp.playMusic(0); // Start music
+			    	}
+
+			        if (gp.ui.commandNum == 1) {
+			            // Add functionality for "New Game" later
+			        }
+			        if (gp.ui.commandNum == 2) {
+			            System.exit(0); // Exit the game
+			        }
+			}
+			    
+		    
+		    }
+		}
+
 		//playstate
 		if(gp.gameState == gp.playState) {
 			

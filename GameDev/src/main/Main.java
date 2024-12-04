@@ -15,8 +15,7 @@ public static void main(String[] args) {
 		window.add(gamePanel);
 		
 		window.pack();
-	
-		
+			
 		window.setLocationRelativeTo(null);
 		window.setVisible(true);
 		
