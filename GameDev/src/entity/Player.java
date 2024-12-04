@@ -16,7 +16,7 @@ public class Player extends Entity {
 
     // Health attributes
     private int health; // Current health
-    public int maxHealth = 100; // Maximum health
+    public int maxHealth = 6; // Maximum health
 
     public Player(GamePanel gp, KeyHandler keyH) {
         super(gp);
@@ -39,7 +39,7 @@ public class Player extends Entity {
     }
 
     public void setDefaultValues() {
-        worldX = gp.tileSize * 2; // Starting X position
+        worldX = gp.tileSize * 2; //	 Starting X position
         worldY = gp.tileSize * 3;   // Starting Y position
         speed = 4;                   // Movement speed
         direction = "down";          // Default direction

@@ -76,7 +76,16 @@ public class KeyHandler implements KeyListener {
 			}
 			if(code == KeyEvent.VK_ENTER) {
 				enterPressed = true;		
-		}
+			}
+		    if (gp.gameState == gp.gameOverState) {
+		        if (code == KeyEvent.VK_ENTER) {
+		            // Maybe return to title screen or restart
+		            gp.gameState = gp.titleState;
+		        }
+		        if (code == KeyEvent.VK_ESCAPE) {
+		            System.exit(0);
+		        }
+		    }
 		}
 		//pausestate
 		else if(gp.gameState == gp.pauseState) {
