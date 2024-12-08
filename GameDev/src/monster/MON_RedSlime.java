@@ -4,11 +4,13 @@ import java.util.Random;
 
 import entity.Entity;
 import main.GamePanel;
-
+	
 public class MON_RedSlime extends Entity {
-
+	GamePanel gp;
     public MON_RedSlime(GamePanel gp) {
         super(gp);
+        this.gp = gp;
+        type = 2;
         name = "Red Slime";
         speed = 1;
         maxLife = 4;
@@ -27,18 +29,18 @@ public class MON_RedSlime extends Entity {
     
     public void getImage() {
 
-            up1 = setup("/monster/rSlime1");
-            up3 = setup("/monster/rSlime2");
-            up2 = setup("/monster/rSlime3");
-            down1 = setup("/monster/rSlime1");
-            down2 = setup("/monster/rSlime2");
-            down3 = setup("/monster/rSlime3");
-            left1 = setup("/monster/rSlime1");
-            left2 = setup("/monster/rSlime2");
-            left3 = setup("/monster/rSlime3");
-            right1 = setup("/monster/rSlime1");
-            right2 = setup("/monster/rSlime2");
-            right3 = setup("/monster/rSlime3");
+            up1 = setup("/monster/rSlime1", gp.tileSize, gp.tileSize);
+            up3 = setup("/monster/rSlime2", gp.tileSize, gp.tileSize);
+            up2 = setup("/monster/rSlime3", gp.tileSize, gp.tileSize);
+            down1 = setup("/monster/rSlime1", gp.tileSize, gp.tileSize);
+            down2 = setup("/monster/rSlime2", gp.tileSize, gp.tileSize);
+            down3 = setup("/monster/rSlime3", gp.tileSize, gp.tileSize);
+            left1 = setup("/monster/rSlime1", gp.tileSize, gp.tileSize);
+            left2 = setup("/monster/rSlime2", gp.tileSize, gp.tileSize);
+            left3 = setup("/monster/rSlime3", gp.tileSize, gp.tileSize);
+            right1 = setup("/monster/rSlime1", gp.tileSize, gp.tileSize);
+            right2 = setup("/monster/rSlime2", gp.tileSize, gp.tileSize);
+            right3 = setup("/monster/rSlime3", gp.tileSize, gp.tileSize);
     }
 
     public void setAction() {

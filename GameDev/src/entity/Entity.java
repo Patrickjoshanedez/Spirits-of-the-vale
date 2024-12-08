@@ -1,5 +1,6 @@
 package entity;
 
+import java.awt.AlphaComposite;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -16,6 +17,7 @@ public class Entity {
 
     GamePanel gp;
     public BufferedImage up1, up2, up3, down1, down2, down3, left1, left2, left3, right1, right2, right3;
+    public BufferedImage attackUp1,  attackUp2,  attackUp3,  attackDown1, attackDown2, attackDown3, attackRight1,  attackRight2, attackRight3, attackLeft1, attackLeft2, attackLeft3;
     public String direction = "down";
 
     public int spriteCounter = 0;
@@ -24,11 +26,15 @@ public class Entity {
     public int solidAreaDefaultX, solidAreaDefaultY;
     public boolean collisionOn = false;
     public int actionLockCounter = 0;
+    public boolean invincible = false;
+    public int invincibleCounter = 0;
     public String[] dialogue = new String[20]; // Initialize dialogue array
     public int dialogueIndex = 0;
     public BufferedImage image, image2, image3;
     public String name;
     public boolean collision = false;
+    public int type; 
+    boolean attacking = false;
 
     // CHARACTER STATUS
     public int maxLife;
@@ -73,6 +79,15 @@ public class Entity {
         gp.cChecker.checkEntity(this, gp.npc);
         gp.cChecker.checkEntity(this, gp.monster);
         gp.cChecker.checkPlayer(this);
+        boolean contactPlayer = gp.cChecker.checkPlayer(this);
+        
+        
+        if(this.type == 2 && contactPlayer == true) {
+        	if(gp.player.invincible == false) {
+        		gp.player.life -= 1;
+        		gp.player.invincible = true;
+        	}
+        }
         
 
         // If no collision, move the entity
@@ -96,23 +111,35 @@ public class Entity {
 
     public void draw(Graphics2D g2) {
         BufferedImage image = null;
+        int drawX = screenX; // Default X position
+        int drawY = screenY; // Default Y position
+        int drawWidth = gp.tileSize; // Default width
+        int drawHeight = gp.tileSize; // Default height
 
-        // Calculate screen position
-        int screenX = worldX - gp.player.worldX + gp.player.screenX;
-        int screenY = worldY - gp.player.worldY + gp.player.screenY;
-
-        // Check if the entity is within the player's view
-        if (worldX + gp.tileSize > gp.player.worldX - gp.player.screenX &&
-            worldX - gp.tileSize < gp.player.worldX + gp.player.screenX &&
-            worldY + gp.tileSize > gp.player.worldY - gp.player.screenY &&
-            worldY - gp.tileSize < gp.player.worldY + gp.player.screenY) {
-
-            // Static objects don't animate
-            if (isStatic) {
-                image = down1; // Use a single static image (e.g., down1)
-            } else {
-                // Determine sprite based on direction for animated entities
-            	switch (direction) {
+        if (attacking) {
+            switch (direction) {
+                case "up":
+                    image = getSpriteImage(attackUp1, attackUp2, attackUp3);
+                    drawHeight = gp.tileSize * 2; // Adjust height for up attack
+                    drawY -= gp.tileSize; // Adjust position to draw the extended attack above the player
+                    break;
+                case "down":
+                    image = getSpriteImage(attackDown1, attackDown2, attackDown3);
+                    drawHeight = gp.tileSize * 2; // Adjust height for down attack
+                    break;
+                case "left":
+                    image = getSpriteImage(attackLeft1, attackLeft2, attackLeft3);
+                    drawWidth = gp.tileSize * 2; // Adjust width for left attack
+                    drawX -= gp.tileSize; // Adjust position to draw the extended attack to the left
+                    break;
+                case "right":
+                    image = getSpriteImage(attackRight1, attackRight2, attackRight3);
+                    drawWidth = gp.tileSize * 2; // Adjust width for right attack
+                    break;
+            }
+        } else {
+            // Non-attacking sprites
+            switch (direction) {
                 case "up":
                     image = getSpriteImage(up1, up2, up3);
                     break;
@@ -125,12 +152,21 @@ public class Entity {
                 case "right":
                     image = getSpriteImage(right1, right2, right3);
                     break;
-                }
             }
-
-            g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);
         }
+
+        // Handle invincibility effect (optional)
+        if (invincible) {
+            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.3f)); // Transparent effect
+        }
+
+        // Draw the sprite with adjusted dimensions
+        g2.drawImage(image, drawX, drawY, drawWidth, drawHeight, null);
+
+        // Reset alpha if transparency was applied
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
     }
+
 
         
     
@@ -142,13 +178,13 @@ public class Entity {
                worldY - gp.tileSize < gp.player.worldY + gp.player.screenY;
     }
 
-    public BufferedImage setup(String imagePath) {
+    public BufferedImage setup(String imagePath, int width, int height) {
         UtilityTool uTool = new UtilityTool();
         BufferedImage image = null;
 
         try {
             image = ImageIO.read(getClass().getResourceAsStream(imagePath + ".png"));
-            image = uTool.scaleImage(image, gp.tileSize, gp.tileSize);
+            image = uTool.scaleImage(image, width, height);
         } catch (IOException e) {
             e.printStackTrace();
         }

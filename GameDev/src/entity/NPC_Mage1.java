@@ -16,18 +16,18 @@ public class NPC_Mage1 extends Entity{
 	    setDialogue();
 	}
 	public void getPlayerImage() {
-        up1 = setup("/npc/npc_up1");
-        up2 = setup("/npc/npc_up2");
-        up3 = setup("/npc/npc_up3");
-        down1 = setup("/npc/npc_down1");
-        down2 = setup("/npc/npc_down2");
-        down3 = setup("/npc/npc_down3");
-        left1 = setup("/npc/npc_left1");
-        left2 = setup("/npc/npc_left2");
-        left3 = setup("/npc/npc_left3");
-        right1 = setup("/npc/npc_right1");
-        right2 = setup("/npc/npc_right2");
-        right3 = setup("/npc/npc_right3");
+        up1 = setup("/npc/npc_up1", gp.tileSize, gp.tileSize);
+        up2 = setup("/npc/npc_up2", gp.tileSize, gp.tileSize);
+        up3 = setup("/npc/npc_up3", gp.tileSize, gp.tileSize);
+        down1 = setup("/npc/npc_down1", gp.tileSize, gp.tileSize);
+        down2 = setup("/npc/npc_down2", gp.tileSize, gp.tileSize);
+        down3 = setup("/npc/npc_down3", gp.tileSize, gp.tileSize);
+        left1 = setup("/npc/npc_left1", gp.tileSize, gp.tileSize);
+        left2 = setup("/npc/npc_left2", gp.tileSize, gp.tileSize);
+        left3 = setup("/npc/npc_left3", gp.tileSize, gp.tileSize);
+        right1 = setup("/npc/npc_right1", gp.tileSize, gp.tileSize);
+        right2 = setup("/npc/npc_right2", gp.tileSize, gp.tileSize);
+        right3 = setup("/npc/npc_right3", gp.tileSize, gp.tileSize);
     }
 	public void setDialogue() {
 		
