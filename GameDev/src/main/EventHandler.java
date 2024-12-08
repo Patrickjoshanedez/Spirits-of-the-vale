@@ -1,13 +1,33 @@
-
 package main;
 
 import java.awt.Rectangle;
 
 public class EventHandler {
 
-    GamePanel gp;
-    Rectangle eventRect;
-    int eventRectDefaultX, eventRectDefaultY;
+    private GamePanel gp;
+    EventRect eventRect[][];
+    
+    int previousEventX, previousEventY;
+    boolean canTouchEvent = true;
+    
+    private boolean fountainEventTriggered = false;
+    
+    private int eventRectDefaultX, eventRectDefaultY;
+    private boolean rockBlockCooldown = false;
+    private int rockBlockCooldownCounter = 0;
+    private static final int ROCK_BLOCK_COOLDOWN_TIME = 240; // 4 seconds at 60 FPS
+    private boolean doorCooldown = false;
+    private int doorCooldownCounter = 0;
+    private static final int DOOR_COOLDOWN_TIME = 120; // 2 seconds at 60 FPS
+    private boolean orbCooldown = false;
+    private int orbCooldownCounter = 0;
+    private static final int ORB_COOLDOWN_TIME = 120; // 2 seconds at 60 FPS
+
+    // Bridge Variables
+    private boolean bridgeCooldown = false;
+    private int bridgeCooldownCounter = 0;
+    private static final int BRIDGE_COOLDOWN_TIME = 120; // 2 seconds at 60 FPS
+    
 
     // Damage handling variables
     private boolean canTakeDamage = true;
@@ -15,26 +35,131 @@ public class EventHandler {
 
     public EventHandler(GamePanel gp) {
         this.gp = gp;
-
-        eventRect = new Rectangle();
-        eventRect.x = 23;
-        eventRect.y = 23;
-        eventRect.width = 2;
-        eventRect.height = 2;
-        eventRectDefaultX = eventRect.x;
-        eventRectDefaultY = eventRect.y;
+        
+        eventRect = new EventRect[gp.maxWorldCol][gp.maxWorldRow];
+        
+        int col = 0;
+        int row = 0;
+        while(col < gp.maxWorldCol && row < gp.maxWorldRow) {
+        	
+        	eventRect[col][row] = new EventRect();
+            eventRect[col][row].x = 23;
+            eventRect[col][row].y = 23;
+            eventRect[col][row].width = 2;
+            eventRect[col][row].height = 2;
+            eventRect[col][row].eventRectDefaultX = eventRect[col][row].x;
+            eventRect[col][row].eventRectDefaultY = eventRect[col][row].y;
+        	col++;
+        	
+        	
+        	if(col == gp.maxWorldCol) {
+        		col = 0;
+        		row++;
+        	}
+        	
+        }
+        
     }
 
     public void checkEvent() {
-        // Check for pit damage event
-        if (hit(4, 1, "up")) {
-            if (canTakeDamage) {
-                damagePit(gp.dialogueState);
-                canTakeDamage = false;
-                damageCooldown = 60; // 1 second at 60 FPS
+    	
+    	//check if player character is more than 1 tile away from the last event
+    	int xDistance = Math.abs(gp.player.worldX - previousEventX);
+    	int yDistance = Math.abs(gp.player.worldY - previousEventY);
+    	int distance = Math.max(xDistance, yDistance);
+    	
+    	if(distance > gp.tileSize) {
+    		canTouchEvent = true;
+    	}
+    	
+    	if(canTouchEvent == true) {
+    		// Check for pit damage event
+            if (hit(4, 1, "any")) {
+                if (canTakeDamage) {
+                    damagePit(gp.dialogueState);
+                    canTakeDamage = false;
+                    damageCooldown = 60; // 1 second at 60 FPS
+                    canTouchEvent = false;
+                }
             }
-        }
+            
+            // Proximity to water fountain
+            if (isNear(45, 4, 2)) { // Tile (45, 4) with a proximity range of 2
+                fountainProximityEvent();
+            }
 
+            // Check for healing pool event
+            if (hit(45, 4, "any")) {
+                healingPool(gp.dialogueState);
+            }	
+            
+            //rock dialogue
+            if (rockBlockCooldown) {
+                rockBlockCooldownCounter++;
+                if (rockBlockCooldownCounter >= ROCK_BLOCK_COOLDOWN_TIME) {
+                    rockBlockCooldown = false;
+                    rockBlockCooldownCounter = 0;
+                }
+            }
+
+            // Rock block event with cooldown check
+            if (hit(16, 12, "left") || hit(16, 13, "left")) {
+                if (!rockBlockCooldown) {
+                    rockBlock(gp.dialogueState);
+                    rockBlockCooldown = true;
+                    rockBlockCooldownCounter = 0;
+                }
+            }
+            
+         // Existing cooldown logic for door
+            if (doorCooldown) {
+                doorCooldownCounter++;
+                if (doorCooldownCounter >= DOOR_COOLDOWN_TIME) {
+                    doorCooldown = false;
+                    doorCooldownCounter = 0;
+                }
+            }
+
+            // Modify door event checks to include cooldown
+            if (hit(22, 8, "up")) {
+                if (!doorCooldown) {
+                    doorEvent(gp.dialogueState);
+                    doorCooldown = true;
+                    doorCooldownCounter = 0;
+                }
+            }
+            if (hit(10, 41, "up")) {
+                if (!doorCooldown) {
+                    doorEvent(gp.dialogueState);
+                    doorCooldown = true;
+                    doorCooldownCounter = 0;
+                }
+            }
+            if (hit(19, 44, "up")) {
+                if (!doorCooldown) {
+                    doorEvent(gp.dialogueState);
+                    doorCooldown = true;
+                    doorCooldownCounter = 0;
+                }
+            }
+            // Teleportation Orb Event
+            if (hit(46, 46, "any")) {
+                if (!orbCooldown) {
+                    teleportationOrbEvent1(gp.dialogueState);
+                    orbCooldown = true;
+                    orbCooldownCounter = 0;
+                }
+            }
+            // Teleportation Orb Event return
+            if (hit(10, 13, "any")) {
+                if (!orbCooldown) {
+                    teleportationOrbEvent(gp.dialogueState);
+                    orbCooldown = true;
+                    orbCooldownCounter = 0;
+                }
+            }
+    	}
+        
         // Cooldown logic
         if (!canTakeDamage) {
             damageCooldown--;
@@ -42,42 +167,127 @@ public class EventHandler {
                 canTakeDamage = true;
             }
         }
+     // Orb Cooldown Logic
+        if (orbCooldown) {
+            orbCooldownCounter++;
+            if (orbCooldownCounter >= ORB_COOLDOWN_TIME) {
+                orbCooldown = false;
+                orbCooldownCounter = 0;
+            }
+        }
+
+        // Bridge Cooldown Logic
+        if (bridgeCooldown) {
+            bridgeCooldownCounter++;
+            if (bridgeCooldownCounter >= BRIDGE_COOLDOWN_TIME) {
+                bridgeCooldown = false;
+                bridgeCooldownCounter = 0;
+            }
+        }
     }
 
-    public boolean hit(int eventCol, int eventRow, String reqDirection) {
+    public boolean hit(int col, int row, String reqDirection) {
         boolean hit = false;
 
-        // Save original player solid area
+        // Null checks
+        if (gp == null || gp.player == null) {
+            return false;
+        }
+
+        // Save original positions
         int playerSolidX = gp.player.solidArea.x;
         int playerSolidY = gp.player.solidArea.y;
+        int eventRectX = eventRect[col][row].x;
+        int eventRectY = eventRect[col][row].y;
 
         // Update player solid area to world coordinates
         gp.player.solidArea.x = gp.player.worldX + gp.player.solidArea.x;
         gp.player.solidArea.y = gp.player.worldY + gp.player.solidArea.y;
 
-        // Update event rectangle position
-        eventRect.x = eventCol * gp.tileSize + eventRectDefaultX;
-        eventRect.y = eventRow * gp.tileSize + eventRectDefaultY;
+        // Update event rectangle to world coordinates
+        eventRect[col][row].x = col * gp.tileSize + eventRect[col][row].eventRectDefaultX;
+        eventRect[col][row].y = row * gp.tileSize + eventRect[col][row].eventRectDefaultY;
 
-        // Check intersection
-        if (gp.player.solidArea.intersects(eventRect)) {
+        // Check for intersection
+        if (gp.player.solidArea.intersects(eventRect[col][row])) {
             if (gp.player.direction.equals(reqDirection) || reqDirection.equals("any")) {
                 hit = true;
+
+                // Update previous event position
+                previousEventX = gp.player.worldX;
+                previousEventY = gp.player.worldY;
+
+                // Debug output to check collision results
+                System.out.println("Collision detected at: " + previousEventX + ", " + previousEventY);
             }
         }
 
-        // Restore original player solid area
+        // Restore original positions
         gp.player.solidArea.x = playerSolidX;
         gp.player.solidArea.y = playerSolidY;
-
-        // Reset event rectangle position
-        eventRect.x = eventRectDefaultX;
-        eventRect.y = eventRectDefaultY;
+        eventRect[col][row].x = eventRectX;
+        eventRect[col][row].y = eventRectY;
 
         return hit;
     }
+    public void fountainProximityEvent() {
+        if (gp == null || gp.ui == null || gp.player == null || gp.keyH == null) {
+            return;
+        }
 
+        // Trigger only if the event has not already been triggered
+        if (!fountainEventTriggered) {
+            gp.gameState = gp.dialogueState;
+            gp.ui.currentDialogue = "You hear the soothing sound of water...\n" +
+                                    "The fountain seems to beckon you.\n" +
+                                    "Press Enter to interact.";
+            fountainEventTriggered = true; // Mark the event as triggered
+        }
+
+        // Handle Enter key press to trigger the healing pool event
+        if (gp.keyH.enterPressed) {
+            // Only allow entering if the player is pressing enter to trigger healing
+            if (isNear(45, 4, 2)) {
+                healingPool(gp.dialogueState);
+            }
+            gp.keyH.enterPressed = false; // Reset enterPressed flag
+            canTouchEvent = false; // Prevent immediate retrigger
+        }
+    }
+
+
+
+ // Checks if the player is within range of a given point
+    private boolean isNear(int targetCol, int targetRow, int range) {
+        if (gp == null || gp.player == null) {
+            return false;
+        }
+
+        int playerCol = gp.player.worldX / gp.tileSize;
+        int playerRow = gp.player.worldY / gp.tileSize;
+
+        int colDistance = Math.abs(playerCol - targetCol);
+        int rowDistance = Math.abs(playerRow - targetRow);
+
+        return colDistance <= range && rowDistance <= range;
+    }
+
+    public void doorEvent(int gameState) {
+        // Null checks
+        if (gp == null || gp.ui == null) {
+            System.err.println("Critical error: Game components are null");
+            return;
+        }
+
+        // Set game state to dialogue
+        gp.gameState = gameState;
+
+        // Set door dialogue
+        gp.ui.currentDialogue = "The door is locked \n(I should just explore more)";
+    }
+    
     public void damagePit(int gameState) {
+        // Null checks
         if (gp == null || gp.ui == null || gp.player == null) {
             System.err.println("Critical error: Game components are null");
             return;
@@ -100,4 +310,110 @@ public class EventHandler {
             gp.playSE(4);
         }
     }
-}
+    //healing pool
+    public void healingPool(int gameState) {
+        // Null checks
+        if (gp == null || gp.ui == null || gp.player == null || gp.keyH == null) {
+            System.err.println("Critical error: Game components are null");
+            return;
+        }
+
+        // Check if player is near and Enter is pressed
+        if (isNear(45, 4, 2) && gp.keyH.enterPressed) {
+            // Set the game state to dialogue state
+            gp.gameState = gameState;
+            gp.ui.currentDialogue = "You have taken a sip from this\n mysterious fountain. Fortunately, it \nfills you with vitality.";
+
+            // Heal the player
+            int maxLife = gp.player.maxLife;
+            gp.player.life = Math.min(gp.player.life + 1, maxLife);
+
+            // Play healing sound
+            gp.playSE(2); // Assuming sound effect index 2 is for healing
+
+            // Reset Enter key flag
+            gp.keyH.enterPressed = false;
+            canTouchEvent = false; // Prevent immediate retrigger
+        }
+    }
+
+
+    public void rockBlock(int gameState) {
+        // Null checks
+        if (gp == null || gp.ui == null || gp.player == null || gp.keyH == null) {
+            System.err.println("Critical error: Game components are null");
+            return;
+        }
+
+        // Set the game state to dialogue state
+        gp.gameState = gp.dialogueState;
+        
+        // Set dialogue message
+        gp.ui.currentDialogue = "Rocks are blocking the way.\n" +
+                                 "You cannot pass through here.";
+
+        // Reset enter pressed to prevent repeated triggers
+        gp.keyH.enterPressed = false;
+    }
+    //teleport 
+    public void teleportationOrbEvent1(int gameState) {
+        // Null checks
+        if (gp == null || gp.ui == null || gp.player == null) {
+            System.err.println("Critical error: Game components are null");
+            return;
+        }
+
+        // Set game state to dialogue
+        gp.gameState = gameState;
+
+        // Teleportation dialogue
+        gp.ui.currentDialogue = "A mystical orb pulses with energy.\n" +
+                                 "As you touch it, you feel a sudden\n" +
+                                 "shift in reality...";
+
+        // Teleport player to a specific location
+        gp.player.worldX = gp.tileSize * 10; // Example X coordinate
+        gp.player.worldY = gp.tileSize * 13; // Example Y coordinate
+
+        // Optional: Play teleportation sound
+        gp.playSE(5); // Assuming sound effect index 5 is for teleportation
+    }
+    //teleport back
+    public void teleportationOrbEvent(int gameState) {
+        // Null checks
+        if (gp == null || gp.ui == null || gp.player == null) {
+            System.err.println("Critical error: Game components are null");
+            return;
+        }
+
+        // Set game state to dialogue
+        gp.gameState = gameState;
+
+        // Teleportation dialogue
+        gp.ui.currentDialogue = "A mystical orb pulses with energy.\n" +
+                                 "As you touch it, you feel a sudden\n" +
+                                 "shift in reality...";
+
+        // Teleport player to a specific location
+        gp.player.worldX = gp.tileSize * 46; // Example X coordinate
+        gp.player.worldY = gp.tileSize * 46; // Example Y coordinate
+
+        // Optional: Play teleportation sound
+        gp.playSE(5); // Assuming sound effect index 5 is for teleportation
+    }
+    public void bridgeEvent(int gameState) {
+        // Null checks
+        if (gp == null || gp.ui == null || gp.player == null) {
+            System.err.println("Critical error: Game components are null");
+            return;
+        }
+
+        // Set game state to dialogue
+        gp.gameState = gameState;
+
+        // Bridge interaction dialogue
+        gp.ui.currentDialogue = "This bridge looks dangerous enough.";
+
+
+        }
+    }

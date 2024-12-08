@@ -12,9 +12,10 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DecimalFormat;
+import entity.Entity;
 
 import object.OBJ_Heart;
-import object.SuperObjects;
+
 
 public class UI {
 
@@ -46,7 +47,7 @@ public class UI {
         }
 
         // CREATE HUD OBJECT
-        SuperObjects heart = new OBJ_Heart(gp);
+        Entity heart = new OBJ_Heart(gp);
         heart1 = heart.image;
         heart2 = heart.image2;
         heart3 = heart.image3;

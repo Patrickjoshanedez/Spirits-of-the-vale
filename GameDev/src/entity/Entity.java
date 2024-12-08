@@ -12,10 +12,11 @@ public class Entity {
 
     public int worldX, worldY;
     public int speed;
+    public boolean isStatic = false; // Flag to check if the entity is static (no animation)
 
     GamePanel gp;
     public BufferedImage up1, up2, up3, down1, down2, down3, left1, left2, left3, right1, right2, right3;
-    public String direction;
+    public String direction = "down";
 
     public int spriteCounter = 0;
     public int spriteNum = 1;
@@ -23,53 +24,59 @@ public class Entity {
     public int solidAreaDefaultX, solidAreaDefaultY;
     public boolean collisionOn = false;
     public int actionLockCounter = 0;
-    String dialogue[] = new String[20];
-    int dialogueIndex = 0;
-    
-    //CHARACTER STATUS
+    public String[] dialogue = new String[20]; // Initialize dialogue array
+    public int dialogueIndex = 0;
+    public BufferedImage image, image2, image3;
+    public String name;
+    public boolean collision = false;
+
+    // CHARACTER STATUS
     public int maxLife;
     public int life;
-	public String name;
-    
+
     public Entity(GamePanel gp) {
         this.gp = gp;
     }
-    
+
     public void setAction() {
-    	
+        // Override in subclasses
     }
+
     public void speak() {
-    	if(dialogue[dialogueIndex]==null) {
-			dialogueIndex = 0;
-		}
-		gp.ui.currentDialogue = dialogue[dialogueIndex];
-		dialogueIndex ++;
-		switch(gp.player.direction) {
-		case"up":
-			direction = "down";
-			break;
-		case"down":
-			direction = "up";
-			break;
-		case"left":
-			direction = "right";
-			break;
-		case"right":
-			direction = "left";
-			break;
-		}
+        if (dialogue[dialogueIndex] == null) {
+            dialogueIndex = 0; // Reset to the first dialogue if out of bounds
+        }
+        gp.ui.currentDialogue = dialogue[dialogueIndex];
+        dialogueIndex++;
+        // Change direction based on player's direction
+        switch (gp.player.direction) {
+            case "up":
+                direction = "down";
+                break;
+            case "down":
+                direction = "up";
+                break;
+            case "left":
+                direction = "right";
+                break;
+            case "right":
+                direction = "left";
+                break;
+        }
     }
-    
+
     public void update() {
-    	setAction();
-    	collisionOn = false;
-    	gp.cChecker.checkTile(this);
-    	gp.cChecker.checkObject(this, false);
-    	gp.cChecker.checkPlayer(this);
-    	
-    	// If no collision, move the player
-    	
-        if (!collisionOn) {
+        setAction();
+        collisionOn = false;
+        gp.cChecker.checkTile(this);
+        gp.cChecker.checkObject(this, false);
+        gp.cChecker.checkEntity(this, gp.npc);
+        gp.cChecker.checkEntity(this, gp.monster);
+        gp.cChecker.checkPlayer(this);
+        
+
+        // If no collision, move the entity
+        if (!collisionOn && !isStatic) { // Don't move if it's static
             switch (direction) {
                 case "up":
                     worldY -= speed;
@@ -86,7 +93,7 @@ public class Entity {
             }
         }
     }
-    
+
     public void draw(Graphics2D g2) {
         BufferedImage image = null;
 
@@ -99,9 +106,13 @@ public class Entity {
             worldX - gp.tileSize < gp.player.worldX + gp.player.screenX &&
             worldY + gp.tileSize > gp.player.worldY - gp.player.screenY &&
             worldY - gp.tileSize < gp.player.worldY + gp.player.screenY) {
-            
-            // Determine the sprite image based on the direction
-            switch (direction) {
+
+            // Static objects don't animate
+            if (isStatic) {
+                image = down1; // Use a single static image (e.g., down1)
+            } else {
+                // Determine sprite based on direction for animated entities
+            	switch (direction) {
                 case "up":
                     image = getSpriteImage(up1, up2, up3);
                     break;
@@ -114,30 +125,46 @@ public class Entity {
                 case "right":
                     image = getSpriteImage(right1, right2, right3);
                     break;
+                }
             }
 
-            // Draw the image on the screen
             g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);
         }
     }
 
-    public BufferedImage setup(String imageName) {
+        
+    
+
+    private boolean isInView() {
+        return worldX + gp.tileSize > gp.player.worldX - gp.player.screenX &&
+               worldX - gp.tileSize < gp.player.worldX + gp.player.screenX &&
+               worldY + gp.tileSize > gp.player.worldY - gp.player.screenY &&
+               worldY - gp.tileSize < gp.player.worldY + gp.player.screenY;
+    }
+
+    public BufferedImage setup(String imagePath) {
         UtilityTool uTool = new UtilityTool();
-        BufferedImage scaledImage = null;
+        BufferedImage image = null;
 
         try {
-            scaledImage = ImageIO.read(getClass().getResourceAsStream(imageName + ".png"));
-            scaledImage = uTool.scaleImage(scaledImage, gp.tileSize, gp.tileSize);
+            image = ImageIO.read(getClass().getResourceAsStream(imagePath + ".png"));
+            image = uTool.scaleImage(image, gp.tileSize, gp.tileSize);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return scaledImage; // Return the scaled image
+
+        return image; // Ensure this is only called once during object initialization
     }
 
     private BufferedImage getSpriteImage(BufferedImage img1, BufferedImage img2, BufferedImage img3) {
-        // Manage sprite animation here (not implemented in the original code)
+        // If the entity is static (like the door), don't animate
+        if (isStatic) {
+            return img1; // Always use the first image for static objects
+        }
+
+        // Manage sprite animation here (for moving entities like NPCs)
         spriteCounter++;
-        if (spriteCounter > 10) { // Change this value to adjust the speed of sprite change
+        if (spriteCounter > 25) { // Change this value to adjust the speed of sprite change
             spriteCounter = 0;
             spriteNum++;
             if (spriteNum > 3) {
@@ -146,10 +173,14 @@ public class Entity {
         }
 
         switch (spriteNum) {
-            case 1: return img1;
-            case 2: return img2;
-            case 3: return img3;
-            default: return img1;
+            case 1:
+                return img1;
+            case 2:
+                return img2;
+            case 3:
+                return img3;
+            default:
+                return img1;
         }
     }
 }

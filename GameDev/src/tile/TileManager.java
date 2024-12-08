@@ -9,8 +9,8 @@ import javax.imageio.ImageIO;
 import main.GamePanel;
 import main.UtilityTool;
 
-public class TileManager {
 
+public class TileManager {
     GamePanel gp;
     public Tile[] tile;
     public int mapTileNum[][];
@@ -18,7 +18,7 @@ public class TileManager {
     public TileManager(GamePanel gp) {
         this.gp = gp;
 
-        tile = new Tile[155]; // Increased to accommodate tile index 154
+        tile = new Tile[165]; // Increased to 165 to include tile 164
         mapTileNum = new int[gp.maxWorldCol][gp.maxWorldRow];
 
         getTileImage();
@@ -26,7 +26,7 @@ public class TileManager {
     }
 
     public void getTileImage() {
-        for (int i = 0; i < 155; i++) {
+        for (int i = 0; i < 165; i++) { // Updated to 165
             String imagePath = String.format("%03d", i);
             boolean collision = (i >= 1 && i <= 39) || 
                                 (i >= 59 && i <= 69) || 
@@ -40,7 +40,8 @@ public class TileManager {
                                 (i == 109) || 
                                 (i >= 111 && i <= 133) || 
                                 (i == 142) || 
-                                (i == 151);
+                                (i == 151) ||
+                                (i >= 155 && i <= 163); // Include new tile 164 in collision check
 
             setup(i, imagePath, collision);
         }
@@ -54,12 +55,15 @@ public class TileManager {
             tile[index].image = ImageIO.read(getClass().getResourceAsStream("/tiles/" + imageName + ".png"));
             
             if (tile[index].image == null) {
-                System.out.println("Failed to load image for tile index: " + index + " Image path: /tiles/" + imageName + ".png");
+                System.err.println("CRITICAL: Failed to load tile image for index " + index);
+                // Optionally, load a default/placeholder image
+                // tile[index].image = defaultImage;
             } else {
                 tile[index].image = uTool.scaleImage(tile[index].image, gp.tileSize, gp.tileSize);
                 tile[index].collision = collision;
             }
         } catch (IOException e) {
+            System.err.println("Error loading tile image for index " + index + ": " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -108,7 +112,7 @@ public class TileManager {
             int screenY = worldY - gp.player.worldY + gp.player.screenY;
 
             if (worldX + gp.tileSize > gp.player.worldX - gp.player.screenX && 
-                worldX - gp.tileSize < gp.player.worldX + gp.player.screenX &&
+                worldX - gp.tileSize < gp.player.worldX + gp.player .screenX &&
                 worldY + gp.tileSize > gp.player.worldY - gp.player.screenY &&
                 worldY - gp.tileSize < gp.player.worldY + gp.player.screenY) {
                 

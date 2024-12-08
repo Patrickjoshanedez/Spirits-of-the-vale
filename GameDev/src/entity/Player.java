@@ -13,7 +13,7 @@ public class Player extends Entity {
     public final int screenX;
     public final int screenY;
     int standCounter = 0;
-
+    
     // Health attributes
     private int health; // Current health
     public int maxHealth = 6; // Maximum health
@@ -88,6 +88,10 @@ public class Player extends Entity {
             // Check NPC collision
             int npcIndex = gp.cChecker.checkEntity(this, gp.npc);
             interactNPC(npcIndex);
+            
+         // Check Monster collision
+            int monsterIndex = gp.cChecker.checkEntity(this, gp.monster);
+
             
             //CHECK EVENT
             gp.eHandler.checkEvent();

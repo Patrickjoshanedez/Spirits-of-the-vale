@@ -1,25 +1,23 @@
 package object;
 
-import java.io.IOException;
-import javax.imageio.ImageIO;
+import entity.Entity;
 import main.GamePanel;
-import main.UtilityTool; // Ensure to import the UtilityTool class
 
-public class OBJ_Door extends SuperObjects {
-    GamePanel gp;
-    UtilityTool uTool; // Declare the UtilityTool instance
+//OBJ_Door.java
+public class OBJ_Door extends Entity {
 
-    public OBJ_Door(GamePanel gp) {
-        this.gp = gp;
-        name = "Door";
-        uTool = new UtilityTool(); // Initialize the UtilityTool instance
+ public OBJ_Door(GamePanel gp) {
+     super(gp);
+     name = "Door";
+     down1 = setup("/objects/door");
+     collision = true;
+     isStatic = true;
 
-        try {
-            image = ImageIO.read(getClass().getResourceAsStream("/objects/door.png"));
-            image = uTool.scaleImage(image, gp.tileSize, gp.tileSize); // Use the uTool instance to scale the image
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        collision = true;
-    }
+     solidArea.x = 0;
+     solidArea.y = 16;
+     solidArea.width = 48;
+     solidArea.height = 32;
+     solidAreaDefaultX = solidArea.x;
+     solidAreaDefaultY = solidArea.y;
+ }
 }
