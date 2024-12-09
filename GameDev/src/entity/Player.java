@@ -1,8 +1,6 @@
 package entity;
 
 import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -43,17 +41,16 @@ public class Player extends Entity {
     }
 
     public void setDefaultValues() {
-        worldX = gp.tileSize * 2; //	 Starting X position
-        worldY = gp.tileSize * 3;   // Starting Y position
-        speed = 4;                   // Movement speed
-        direction = "down";          // Default direction
+        worldX = gp.tileSize * 2; // Starting X position
+        worldY = gp.tileSize * 3; // Starting Y position
+        speed = 4;                 // Movement speed
+        direction = "down";        // Default direction
         // PLAYER STATUS
         maxLife = 6;
         life = maxLife;
     }
 
     public void getPlayerImage() {
-        // Load player images (normal movement)
         up1 = setup("/player/up1", gp.tileSize, gp.tileSize);
         up2 = setup("/player/up2", gp.tileSize, gp.tileSize);
         up3 = setup("/player/up3", gp.tileSize, gp.tileSize);
@@ -67,9 +64,8 @@ public class Player extends Entity {
         right2 = setup("/player/right2", gp.tileSize, gp.tileSize);
         right3 = setup("/player/right3", gp.tileSize, gp.tileSize);
     }
-
+    
     public void getPlayerAttackImage() {
-        // Attack sprites for vertical attacks (up/down)
         attackUp1 = setup("/player/up_attack0", gp.tileSize, gp.tileSize * 2);
         attackUp2 = setup("/player/up_attack1", gp.tileSize, gp.tileSize * 2);
         attackUp3 = setup("/player/up_attack2", gp.tileSize, gp.tileSize * 2);
@@ -78,7 +74,6 @@ public class Player extends Entity {
         attackDown2 = setup("/player/down_attack1", gp.tileSize, gp.tileSize * 2);
         attackDown3 = setup("/player/down_attack2", gp.tileSize, gp.tileSize * 2);
 
-        // Attack sprites for horizontal attacks (left/right)
         attackLeft1 = setup("/player/left_attack0", gp.tileSize * 2, gp.tileSize);
         attackLeft2 = setup("/player/left_attack1", gp.tileSize * 2, gp.tileSize);
         attackLeft3 = setup("/player/left_attack2", gp.tileSize * 2, gp.tileSize);
@@ -88,12 +83,12 @@ public class Player extends Entity {
         attackRight3 = setup("/player/right_attack2", gp.tileSize * 2, gp.tileSize);
     }
 
-
     public void update() {
-    	
-    	if(attacking == true) {
-    		attacking();
-    	}
+        if (attacking) {
+            attacking(); // Handle attack animation
+            return; // Skip the rest of the update if attacking
+        }
+
         boolean moving = keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed;
 
         if (moving) {
@@ -171,7 +166,6 @@ public class Player extends Entity {
         }
     }
 
-    
     public void pickUpObject(int i) {
         if (i != 999) {
             // Logic to handle picking up an object
@@ -180,29 +174,24 @@ public class Player extends Entity {
     }
 
     public void interactNPC(int i) {
-    	if(gp.keyH.enterPressed == true) 
-    	{
-    	if (i != 999) {
-        	      
+        if (gp.keyH.enterPressed == true) {
+            if (i != 999) {
                 gp.gameState = gp.dialogueState; // Change game state to dialogue
                 gp.npc[i].speak(); // Call the speak method on the NPC
             } else {
-
-                	attacking = true;
-                
+                attacking = true; // Start attacking if no NPC is interacted with
             }
         }
         gp.keyH.enterPressed = false;
     }
         
     public void contactMonster(int i) {
-    	if(i != 999) {
-    		
-    		if(invincible == false) {
-    			life -= 1;
-    			invincible = true;
-    		}
-    	}
+        if (i != 999) {
+            if (invincible == false) {
+                life -= 1;
+                invincible = true;
+            }
+        }
     }
     
     public void draw(Graphics2D g2) {
@@ -260,4 +249,4 @@ public class Player extends Entity {
                 return sprite1; // Fallback
         }
     }
-}
+} 
