@@ -1,8 +1,6 @@
 package entity;
 
 import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -16,10 +14,14 @@ public class Player extends Entity {
     public final int screenX;
     public final int screenY;
     int standCounter = 0;
-    
+
     // Health attributes
     private int health; // Current health
     public int maxHealth = 6; // Maximum health
+
+    // Attack cooldown attributes
+    private long lastAttackTime; // Time when the last attack occurred
+    private final long attackCooldown = 1000; // Cooldown duration in milliseconds
 
     public Player(GamePanel gp, KeyHandler keyH) {
         super(gp);
@@ -40,19 +42,20 @@ public class Player extends Entity {
         getPlayerImage();
         getPlayerAttackImage();
         this.health = maxHealth; // Initialize health
+        this.lastAttackTime = 0; // Initialize last attack time
     }
 
     public void setDefaultValues() {
-        worldX = gp.tileSize * 2; //	 Starting X position
-        worldY = gp.tileSize * 3;   // Starting Y position
-        speed = 4;                   // Movement speed
-        direction = "down";          // Default direction
-        // PLAYER STATUS
+        worldX = gp.tileSize * 2; // Starting X position
+        worldY = gp.tileSize * 3; // Starting Y position
+        speed = 4;                 // Movement speed
+        direction = "down";        // Default direction
         maxLife = 6;
         life = maxLife;
     }
 
     public void getPlayerImage() {
+        // Load player images (normal movement)
         up1 = setup("/player/up1", gp.tileSize, gp.tileSize);
         up2 = setup("/player/up2", gp.tileSize, gp.tileSize);
         up3 = setup("/player/up3", gp.tileSize, gp.tileSize);
@@ -66,10 +69,9 @@ public class Player extends Entity {
         right2 = setup("/player/right2", gp.tileSize, gp.tileSize);
         right3 = setup("/player/right3", gp.tileSize, gp.tileSize);
     }
-    
-    public void getPlayerAttackImage() {
 
-        // Load attack images for Up and Down (32x64 dimensions)
+    public void getPlayerAttackImage() {
+        // Attack sprites for vertical attacks (up/down)
         attackUp1 = setup("/player/up_attack0", gp.tileSize, gp.tileSize * 2);
         attackUp2 = setup("/player/up_attack1", gp.tileSize, gp.tileSize * 2);
         attackUp3 = setup("/player/up_attack2", gp.tileSize, gp.tileSize * 2);
@@ -78,7 +80,7 @@ public class Player extends Entity {
         attackDown2 = setup("/player/down_attack1", gp.tileSize, gp.tileSize * 2);
         attackDown3 = setup("/player/down_attack2", gp.tileSize, gp.tileSize * 2);
 
-        // Load attack images for Left and Right (64x32 dimensions)
+        // Attack sprites for horizontal attacks (left/right)
         attackLeft1 = setup("/player/left_attack0", gp.tileSize * 2, gp.tileSize);
         attackLeft2 = setup("/player/left_attack1", gp.tileSize * 2, gp.tileSize);
         attackLeft3 = setup("/player/left_attack2", gp.tileSize * 2, gp.tileSize);
@@ -88,12 +90,33 @@ public class Player extends Entity {
         attackRight3 = setup("/player/right_attack2", gp.tileSize * 2, gp.tileSize);
     }
 
-
     public void update() {
-    	
-    	if(attacking == true) {
-    		attacking();
-    	}
+        if (keyH.enterPressed) {
+            attemptAttack(); // Attempt to attack when Enter is pressed
+        }
+        handleMovement(); // Handle movement regardless of attack state
+
+        // Handle invincibility duration
+        if (invincible) {
+            invincibleCounter++;
+            if (invincibleCounter > 60) {
+                invincible = false;
+                invincibleCounter = 0;
+            }
+        }
+    }
+
+    private void attemptAttack() {
+        long currentTime = System.currentTimeMillis(); // Get the current time
+
+        // Check if the cooldown has expired
+        if (currentTime - lastAttackTime >= attackCooldown) {
+            attacking = true; // Start attacking
+            lastAttackTime = currentTime; // Update last attack time
+        }
+    }
+
+    private void handleMovement() {
         boolean moving = keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed;
 
         if (moving) {
@@ -129,103 +152,78 @@ public class Player extends Entity {
                 spriteNum = (spriteNum % 3) + 1; // Loop between 1, 2, 3
                 spriteCounter = 0;
             }
-        } else if (keyH.enterPressed) {
-            // If standing still, allow interactions
-            int npcIndex = gp.cChecker.checkEntity(this, gp.npc);
-            interactNPC(npcIndex);
-
-            int objIndex = gp.cChecker.checkObject(this, true);
-            pickUpObject(objIndex);
-
-            gp.eHandler.checkEvent();
         }
-
-        // Handle invincibility duration
-        if (invincible) {
-            invincibleCounter++;
-            if (invincibleCounter > 60) {
-                invincible = false;
-                invincibleCounter = 0;
-            }
-        }
-
-        System.out.println("Player update called. Game state: " + gp.gameState);
     }
-    
+
     public void attacking() {
         spriteCounter++;
 
         if (spriteCounter <= 5) {
             spriteNum = 1; // First frame
-        }
-        if (spriteCounter > 5 && spriteCounter <= 15) {
+        } else if (spriteCounter <= 15) {
             spriteNum = 2; // Second frame
-        }
-        if (spriteCounter > 15 && spriteCounter <= 25) {
+        } else if (spriteCounter <= 25) {
             spriteNum = 3; // Third frame
-        }
-        if (spriteCounter > 25) {
+        } else {
             spriteNum = 1; // Reset to the first frame
             spriteCounter = 0;
             attacking = false; // Attack animation ends
         }
     }
 
-    
-    public void pickUpObject(int i) {
-        if (i != 999) {
-            // Logic to handle picking up an object
-            // For example: gp.obj[i].interact(); or similar
+    public void contactMonster(int i) {
+        if (i != 999) { // Check if there is a valid monster index
+            if (!invincible) { // Check if the player is not invincible
+                life -= 1; // Decrease player's life
+                invincible = true; // Set invincible state to true
+            }
         }
     }
 
     public void interactNPC(int i) {
-    	if(gp.keyH.enterPressed == true) 
-    	{
-    	if (i != 999) {
-        	      
+        if (i != 999) { // Check if there is a valid NPC index
+            if (gp.keyH.enterPressed) { // Check if the Enter key is pressed
                 gp.gameState = gp.dialogueState; // Change game state to dialogue
                 gp.npc[i].speak(); // Call the speak method on the NPC
-            } else {
-
-                	attacking = true;
-                
             }
+        } else {
+            attacking = true; // Start attacking if not interacting with an NPC
         }
-        gp.keyH.enterPressed = false;
+        gp.keyH.enterPressed = false; // Reset the key press
     }
-        
-    public void contactMonster(int i) {
-    	if(i != 999) {
-    		
-    		if(invincible == false) {
-    			life -= 1;
-    			invincible = true;
-    		}
-    	}
+
+    public void pickUpObject(int i) {
+        if (i != 999) { // Check if there is a valid object index
+            // Logic to handle picking up an object
+            // For example: gp.obj[i].interact(); // Call the interact method on the object
+        }
     }
-    
+
     public void draw(Graphics2D g2) {
         BufferedImage image = null;
 
+        // Select attack sprites based on direction
         if (attacking) {
-            // Select attack sprites based on direction
             switch (direction) {
                 case "up":
                     image = getSpriteImage(attackUp1, attackUp2, attackUp3);
+                    g2.drawImage(image, screenX, screenY - gp.tileSize, gp.tileSize, gp.tileSize * 2, null); // Adjust for height
                     break;
                 case "down":
                     image = getSpriteImage(attackDown1, attackDown2, attackDown3);
+                    g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize * 2, null); // Adjust for height
                     break;
                 case "left":
                     image = getSpriteImage(attackLeft1, attackLeft2, attackLeft3);
+                    g2.drawImage(image, screenX - gp.tileSize, screenY, gp.tileSize * 2, gp.tileSize, null); // Adjust for width
                     break;
                 case "right":
                     image = getSpriteImage(attackRight1, attackRight2, attackRight3);
+                    g2.drawImage(image, screenX, screenY, gp.tileSize * 2, gp.tileSize, null); // Adjust for width
                     break;
             }
         } else {
-            // Select movement sprites based on direction
+            // Normal movement drawing logic
             switch (direction) {
                 case "up":
                     image = getSpriteImage(up1, up2, up3);
@@ -240,30 +238,20 @@ public class Player extends Entity {
                     image = getSpriteImage(right1, right2, right3);
                     break;
             }
+            g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);
         }
-
-        // Handle invincibility effect (if any)
-        if (invincible) {
-            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.3f)); // Transparent effect
-        }
-
-        // Draw the current sprite
-        g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);
-
-        // Reset alpha (if transparency was applied)
-        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
     }
 
     private BufferedImage getSpriteImage(BufferedImage sprite1, BufferedImage sprite2, BufferedImage sprite3) {
         switch (spriteNum) {
             case 1:
-                return sprite1;
+                return sprite1; // Return the first sprite
             case 2:
-                return sprite2;
+                return sprite2; // Return the second sprite
             case 3:
-                return sprite3;
+                return sprite3; // Return the third sprite
             default:
-                return sprite1; // Fallback
+                return sprite1; // Fallback to the first sprite
         }
     }
 }

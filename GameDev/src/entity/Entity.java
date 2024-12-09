@@ -1,5 +1,6 @@
 package entity;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -121,30 +122,43 @@ public class Entity {
             worldY + gp.tileSize > gp.player.worldY - gp.player.screenY &&
             worldY - gp.tileSize < gp.player.worldY + gp.player.screenY) {
 
-            // Static objects don't animate
+            // Choose the appropriate sprite
             if (isStatic) {
-                image = down1; // Use a single static image (e.g., down1)
+                image = down1; // Use a static image for non-animated objects
             } else {
-                // Determine sprite based on direction for animated entities
-            	switch (direction) {
-                case "up":
-                    image = getSpriteImage(up1, up2, up3);
-                    break;
-                case "down":
-                    image = getSpriteImage(down1, down2, down3);
-                    break;
-                case "left":
-                    image = getSpriteImage(left1, left2, left3);
-                    break;
-                case "right":
-                    image = getSpriteImage(right1, right2, right3);
-                    break;
+                // Determine sprite based on direction
+                switch (direction) {
+                    case "up":
+                        image = getSpriteImage(up1, up2, up3);
+                        break;
+                    case "down":
+                        image = getSpriteImage(down1, down2, down3);
+                        break;
+                    case "left":
+                        image = getSpriteImage(left1, left2, left3);
+                        break;
+                    case "right":
+                        image = getSpriteImage(right1, right2, right3);
+                        break;
                 }
             }
 
-            g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);
+            // Calculate offsets for non-standard sprite sizes (e.g., attack sprites)
+            int drawWidth = image.getWidth();   // Use the sprite's width
+            int drawHeight = image.getHeight(); // Use the sprite's height
+            int drawX = screenX - (drawWidth - gp.tileSize) / 2; // Center horizontally
+            int drawY = screenY - (drawHeight - gp.tileSize);    // Adjust vertically for taller sprites
+
+            // Debugging: Draw a red bounding box for visual validation
+            g2.setColor(Color.RED);
+            g2.drawRect(drawX, drawY, drawWidth, drawHeight);
+
+            // Draw the image
+            g2.drawImage(image, drawX, drawY, drawWidth, drawHeight, null);
         }
     }
+
+
 
         
     
