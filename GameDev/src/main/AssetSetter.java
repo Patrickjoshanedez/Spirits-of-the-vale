@@ -1,6 +1,7 @@
 package main;
 
 import entity.NPC_Mage1;
+import monster.MON_AdikEye;
 import monster.MON_RedSlime;
 import object.OBJ_Door;
 
@@ -29,6 +30,10 @@ public class AssetSetter {
     	gp.monster[0] = new MON_RedSlime(gp);
         gp.monster[0].worldX = gp.tileSize * 10;
         gp.monster[0].worldY = gp.tileSize * 4;
+        
+        gp.monster[1] = new MON_AdikEye(gp);
+        gp.monster[1].worldX = gp.tileSize * 11;
+        gp.monster[1].worldY = gp.tileSize * 5;
     }
 
 }

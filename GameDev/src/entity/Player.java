@@ -14,11 +14,12 @@ public class Player extends Entity {
     public final int screenX;
     public final int screenY;
     int standCounter = 0;
+    public boolean attackCanceled = false;
     
     // Health attributes
     private int health; // Current health
     public int maxHealth = 6; // Maximum health
-
+    
     public Player(GamePanel gp, KeyHandler keyH) {
         super(gp);
         this.keyH = keyH;
@@ -34,6 +35,10 @@ public class Player extends Entity {
         solidArea.width = 30;  // Width of collision area
         solidArea.height = 30;  // Height of collision area
 
+        // ATTACK RANGE
+        attackArea.width = 45;
+        attackArea.height = 45;
+        
         setDefaultValues();
         getPlayerImage();
         getPlayerAttackImage();
@@ -48,6 +53,7 @@ public class Player extends Entity {
         // PLAYER STATUS
         maxLife = 6;
         life = maxLife;
+        
     }
 
     public void getPlayerImage() {
@@ -117,6 +123,15 @@ public class Player extends Entity {
                     case "right": worldX += speed; break;
                 }
             }
+            
+            if (keyH.enterPressed == true && attackCanceled == false) {
+            	gp.playSE(6);
+            	attacking = true;
+            	spriteCounter = 0;
+            }
+            
+            attackCanceled = false;
+            gp.keyH.enterPressed = false;
 
             // Update sprite for animation
             spriteCounter++;
@@ -136,7 +151,7 @@ public class Player extends Entity {
         }
 
         // Handle invincibility duration
-        if (invincible) {
+        if (invincible == true) {
             invincibleCounter++;
             if (invincibleCounter > 60) {
                 invincible = false;
@@ -155,6 +170,35 @@ public class Player extends Entity {
         }
         if (spriteCounter > 5 && spriteCounter <= 15) {
             spriteNum = 2; // Second frame
+            
+            // save the current worldX, worldY, soliArea
+            int currentWorldX = worldX;
+            int currentWorldY = worldY;
+            int solidAreaWidth = solidArea.width;
+            int solidAreaHeight = solidArea.height;
+            
+            // Adjust player's worldX/Y for the attackArea
+            switch(direction) {
+            case "up" : worldY -= attackArea.height; break;
+            case "down" : worldY += attackArea.height; break;
+            case "left" : worldX -= attackArea.width; break;
+            case "right" : worldX += attackArea.width; break;
+            }
+            
+            // attack area becomes solidArea
+            solidArea.width = attackArea.width;
+            solidArea.height = attackArea.height;
+            
+            // Check monster collision with the updated worldX, worldY, and solidArea
+            int monsterIndex = gp.cChecker.checkEntity(this, gp.monster);
+            damageMonster(monsterIndex);
+            
+            // After checking collision, restore the original data
+            worldX = currentWorldX;
+            worldY = currentWorldY;
+            solidArea.width = solidAreaWidth;
+            solidArea.height = solidAreaHeight;
+            
         }
         if (spriteCounter > 15 && spriteCounter <= 25) {
             spriteNum = 3; // Third frame
@@ -176,10 +220,12 @@ public class Player extends Entity {
     public void interactNPC(int i) {
         if (gp.keyH.enterPressed == true) {
             if (i != 999) {
+            	attackCanceled = true;
                 gp.gameState = gp.dialogueState; // Change game state to dialogue
                 gp.npc[i].speak(); // Call the speak method on the NPC
             } else {
-                attacking = true; // Start attacking if no NPC is interacted with
+            	gp.playSE(6);
+            	attacking = true;
             }
         }
         gp.keyH.enterPressed = false;
@@ -194,8 +240,27 @@ public class Player extends Entity {
         }
     }
     
+    public void damageMonster(int i) {
+    	if(i != 999) {
+    		if(gp.monster[i].invincible == false) {
+    			gp.monster[i].life -= 1;
+    			gp.monster[i].invincible = true;
+    			gp.monster[i].damageReaction();
+    			
+    			gp.playSE(7);
+    			if(gp.monster[i].life <= 0) {
+    				gp.monster[i].dying = true;
+    			}
+    		}
+    	}
+    	
+    }
+    
     public void draw(Graphics2D g2) {
         BufferedImage image = null;
+        
+        int tempScreenX = screenX;
+        int tempScreenY = screenY;
 
         // Select attack sprites based on direction
         if (attacking) {
@@ -233,7 +298,7 @@ public class Player extends Entity {
                     image = getSpriteImage(right1, right2, right3);
                     break;
             }
-            g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);
+            g2.drawImage(image, tempScreenX, tempScreenY, gp.tileSize, gp.tileSize, null);
         }
     }
 

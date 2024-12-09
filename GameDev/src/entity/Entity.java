@@ -1,5 +1,6 @@
 package entity;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -11,34 +12,50 @@ import main.UtilityTool;
 
 public class Entity {
 
-    public int worldX, worldY;
-    public int speed;
+    
+    
     public boolean isStatic = false; // Flag to check if the entity is static (no animation)
 
     GamePanel gp;
     public BufferedImage up1, up2, up3, down1, down2, down3, left1, left2, left3, right1, right2, right3;
     public BufferedImage attackUp1,  attackUp2,  attackUp3,  attackDown1, attackDown2, attackDown3, attackRight1,  attackRight2, attackRight3, attackLeft1, attackLeft2, attackLeft3;
-    public String direction = "down";
-
-    public int spriteCounter = 0;
-    public int spriteNum = 1;
-    public Rectangle solidArea = new Rectangle(0, 0, 48, 48);
-    public int solidAreaDefaultX, solidAreaDefaultY;
-    public boolean collisionOn = false;
-    public int actionLockCounter = 0;
-    public boolean invincible = false;
-    public int invincibleCounter = 0;
-    public String[] dialogue = new String[20]; // Initialize dialogue array
-    public int dialogueIndex = 0;
     public BufferedImage image, image2, image3;
-    public String name;
+    public Rectangle solidArea = new Rectangle(0, 0, 48, 48);
+    public Rectangle attackArea = new Rectangle(0, 0, 0, 0);
+    public int solidAreaDefaultX, solidAreaDefaultY;
+    public String[] dialogue = new String[20]; // Initialize dialogue array
     public boolean collision = false;
-    public int type; 
-    boolean attacking = false;
-
+    public boolean attackCanceled = false;
+    //STATE
+    public int worldX, worldY;
+    public String direction = "down";
+    public int spriteNum = 1;
+    public int dialogueIndex = 0;
+    public boolean collisionOn = false;
+    public boolean invincible = false;
+    boolean attacking = false; 
+    public boolean alive = true;
+    public boolean dying = false;
+    public boolean hpBarOn = false;
+     
+    //COUNTER
+    public int spriteCounter = 0;
+    public int actionLockCounter = 0;
+    public int invincibleCounter = 0;
+    int dyingCounter = 0;
+    public int hpBarCounter = 0;
+    
     // CHARACTER STATUS
+    public String name;
+    public int type; 
+    public int speed;
     public int maxLife;
     public int life;
+    public int level;
+    public int attack;
+    public int defense;
+    public int nextLevelExp;
+    
 
     public Entity(GamePanel gp) {
         this.gp = gp;
@@ -46,6 +63,9 @@ public class Entity {
 
     public void setAction() {
         // Override in subclasses
+    }
+    public void damageReaction() {
+    	// Override in slime class
     }
 
     public void speak() {
@@ -107,6 +127,7 @@ public class Entity {
                     break;
             }
         }
+        
     }
 
     public void draw(Graphics2D g2) {
@@ -142,25 +163,56 @@ public class Entity {
                         break;
                 }
             }
-
+            
+           
             // Calculate offsets for non-standard sprite sizes (e.g., attack sprites)
             int drawWidth = image.getWidth();   // Use the sprite's width
             int drawHeight = image.getHeight(); // Use the sprite's height
             int drawX = screenX - (drawWidth - gp.tileSize) / 2; // Center horizontally
             int drawY = screenY - (drawHeight - gp.tileSize);    // Adjust vertically for taller sprites
 
-            // Debugging: Draw a red bounding box for visual validation
-            g2.setColor(Color.RED);
-            g2.drawRect(drawX, drawY, drawWidth, drawHeight);
-
+            
+            // MONSTER HP BAR
+            if (type == 2 && hpBarOn == true) {
+            
+            double oneScale = (double)gp.tileSize/maxLife;
+            double hpBarValue = oneScale*life;
+            	
+            g2.setColor(new Color(35, 35, 35));
+            g2.fillRect(screenX - 1, screenY - 16, gp.tileSize+2, 12);
+            
+            g2.setColor(new Color(255, 0, 30));
+            g2.fillRect(screenX, screenY - 15, (int)hpBarValue, 10);
+            
+            hpBarCounter++;
+            if(hpBarCounter > 600) {
+            	hpBarCounter = 0;
+            	hpBarOn = false;
+            	}
+            }
+            
+            if (invincible == true) {
+            	hpBarOn = true;
+    			hpBarCounter = 0;
+            }
+            if (dying == true) {
+            	dyingAnimation(g2);
+            }
             // Draw the image
             g2.drawImage(image, drawX, drawY, drawWidth, drawHeight, null);
+            
+            changeAlpha(g2, 1f);
         }
-    }
-
-
-
         
+        
+        
+    }
+    
+ 
+    
+    public void changeAlpha(Graphics2D g2, float alphaValue) {
+    	g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alphaValue));
+    }
     
 
     private boolean isInView() {
@@ -168,6 +220,26 @@ public class Entity {
                worldX - gp.tileSize < gp.player.worldX + gp.player.screenX &&
                worldY + gp.tileSize > gp.player.worldY - gp.player.screenY &&
                worldY - gp.tileSize < gp.player.worldY + gp.player.screenY;
+    }
+    
+public void dyingAnimation(Graphics2D g2) {
+    	
+    	dyingCounter++;
+    	int i = 5;
+    	if (dyingCounter <= i) {changeAlpha(g2, 0f);}
+    	if (dyingCounter > i && dyingCounter <= i*2) {changeAlpha(g2, 1f); }
+    	if (dyingCounter > i*2 && dyingCounter <= i*3) {changeAlpha(g2, 0f); }
+    	if (dyingCounter > i*3 && dyingCounter <= i*4) {changeAlpha(g2, 1f); }
+    	if (dyingCounter > i*4 && dyingCounter <= i*5) {changeAlpha(g2, 0f); }
+    	if (dyingCounter > i*5 && dyingCounter <= i*6) {changeAlpha(g2, 1f); }
+    	if (dyingCounter > i*6 && dyingCounter <= i*7) {changeAlpha(g2, 0f); }
+    	if (dyingCounter > i*7 && dyingCounter <= i*8) {changeAlpha(g2, 1f); }
+    	if(dyingCounter > i*8) {
+    		gp.playSE(8);
+    		dying = false;
+    		alive = false;
+    	}
+    	
     }
 
     public BufferedImage setup(String imagePath, int width, int height) {
@@ -199,6 +271,15 @@ public class Entity {
                 spriteNum = 1;
             }
         }
+        
+        if (invincible == true) {
+            invincibleCounter++;
+            if (invincibleCounter > 40) {
+                invincible = false;
+                invincibleCounter = 0;
+            }
+        }
+
 
         switch (spriteNum) {
             case 1:
