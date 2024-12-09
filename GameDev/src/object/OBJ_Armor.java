@@ -10,6 +10,6 @@ public class OBJ_Armor extends Entity {
 		name = "Armor";
 		down1 = setup("/objects/armor", gp.tileSize, gp.tileSize);
 		defenseValue = 1;
-		description = "{"+name+"}\nA bit worn Armor but not bad";
+		description = "{"+name+"}\nA bit worn Armor but not \nbad";
 	}
 }
