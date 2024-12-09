@@ -16,6 +16,7 @@ public class MON_AdikEye extends Entity {
         speed = 1; // Slightly faster than Red Slime
         maxLife = 5; // More life than Red Slime
         life = maxLife;
+        exp = 3;
 
         solidArea.x = 5;
         solidArea.y = 5;

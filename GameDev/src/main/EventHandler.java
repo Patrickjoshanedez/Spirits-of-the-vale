@@ -328,6 +328,7 @@ public class EventHandler {
             // Heal the player
             int maxLife = gp.player.maxLife;
             gp.player.life = Math.min(gp.player.life + 1, maxLife);
+            gp.aSetter.setMonster();
 
             // Play healing sound
             gp.playSE(2); // Assuming sound effect index 2 is for healing

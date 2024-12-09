@@ -4,8 +4,13 @@ import java.awt.AlphaComposite;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+
 import main.GamePanel;
 import main.KeyHandler;
+import object.OBJ_Armor;
+import object.OBJ_Key;
+import object.OBJ_Sword;
 
 public class Player extends Entity {
 
@@ -15,6 +20,8 @@ public class Player extends Entity {
     public final int screenY;
     int standCounter = 0;
     public boolean attackCanceled = false;
+    public ArrayList<Entity> inventory = new ArrayList<>();
+    public final int maxInventorySize = 20;
     
     // Health attributes
     private int health; // Current health
@@ -42,6 +49,7 @@ public class Player extends Entity {
         setDefaultValues();
         getPlayerImage();
         getPlayerAttackImage();
+        setItems();
         this.health = maxHealth; // Initialize health
     }
 
@@ -50,12 +58,36 @@ public class Player extends Entity {
         worldY = gp.tileSize * 3; // Starting Y position
         speed = 4;                 // Movement speed
         direction = "down";        // Default direction
+        
+        
         // PLAYER STATUS
+        level = 1;
         maxLife = 6;
         life = maxLife;
-        
+        strength = 1;
+        dexterity = 1;
+        exp = 0;
+        nextLevelExp = 5;
+        currentWeapon = new OBJ_Sword(gp); 
+        currentArmor = new OBJ_Armor(gp);
+        attack = getAttack();
+        defense = getDefense();
     }
-
+    	public void setItems() {
+    		inventory.add(currentWeapon);
+    		inventory.add(currentArmor);
+    		inventory.add(new OBJ_Key(gp));
+    	}
+    	
+        public int getAttack() {
+        	return attack = strength * currentWeapon.attackValue;
+        }
+        
+        public int getDefense() {
+        	return defense = dexterity * currentArmor.defenseValue;
+        }
+       
+    
     public void getPlayerImage() {
         up1 = setup("/player/up1", gp.tileSize, gp.tileSize);
         up2 = setup("/player/up2", gp.tileSize, gp.tileSize);
@@ -234,7 +266,12 @@ public class Player extends Entity {
     public void contactMonster(int i) {
         if (i != 999) {
             if (invincible == false) {
-                life -= 1;
+            	
+            	int damage = gp.monster[i].attack - defense;
+    			if (damage < 0 ) {
+    				damage = 0;
+    			}
+                life -= damage;
                 invincible = true;
             }
         }
@@ -243,18 +280,46 @@ public class Player extends Entity {
     public void damageMonster(int i) {
     	if(i != 999) {
     		if(gp.monster[i].invincible == false) {
-    			gp.monster[i].life -= 1;
+    			
+    			gp.playSE(7);
+    			
+    			int damage = attack - gp.monster[i].defense;
+    			if (damage < 0 ) {
+    				damage = 0;
+    			}
+    			gp.monster[i].life -= damage;
     			gp.monster[i].invincible = true;
     			gp.monster[i].damageReaction();
     			
-    			gp.playSE(7);
+    			
     			if(gp.monster[i].life <= 0) {
     				gp.monster[i].dying = true;
+    				gp.ui.addMessage("killed the " + gp.monster[i].name + "!");
+    				gp.ui.addMessage("Exp +" + gp.monster[i].exp );
+    				exp += gp.monster[i].exp;
+    				checkLevelUp();
     			}
     		}
     	}
     	
     }
+    public void checkLevelUp() {
+    	if (exp >= nextLevelExp) {
+    		level++;
+    		nextLevelExp = nextLevelExp*2;
+    		maxLife += 2;
+    		strength++;
+    		dexterity++;
+    		attack = getAttack();
+    		defense = getDefense();
+    		
+    		gp.gameState = gp.dialogueState;
+    		gp.ui.currentDialogue = "You are level " + level + " now!\n"
+    					+ "You feel stronger!";
+    		
+    	}
+    }
+    
     
     public void draw(Graphics2D g2) {
         BufferedImage image = null;

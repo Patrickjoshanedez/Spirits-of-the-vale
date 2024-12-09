@@ -55,6 +55,16 @@ public class Entity {
     public int attack;
     public int defense;
     public int nextLevelExp;
+    public int exp;
+    public int strength;
+    public int dexterity;
+    public Entity currentWeapon;
+    public Entity currentArmor;
+    
+    //item attributes
+    public int attackValue;
+    public int defenseValue;
+    public String description = "";
     
 
     public Entity(GamePanel gp) {
