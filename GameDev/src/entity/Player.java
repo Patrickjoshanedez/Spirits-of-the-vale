@@ -244,8 +244,18 @@ public class Player extends Entity {
 
     public void pickUpObject(int i) {
         if (i != 999) {
-            // Logic to handle picking up an object
-            // For example: gp.obj[i].interact(); or similar
+String text;
+        	
+            if (inventory.size()!= maxInventorySize) {
+            	
+            	inventory.add(gp.obj[i]);
+            	text = "Obtained " + gp.obj[i].name + "!";
+            }
+            else {
+            	text = "You cannot carry any more items";
+            }
+            gp.ui.addMessage(text);
+            gp.obj[i] = null;
         }
     }
 

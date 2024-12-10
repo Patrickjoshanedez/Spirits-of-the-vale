@@ -5,6 +5,7 @@ import monster.MON_AdikEye;
 import monster.MON_RedSlime;
 import object.OBJ_Armor;
 import object.OBJ_Door;
+import object.OBJ_Katana;
 
 
 public class AssetSetter {
@@ -21,6 +22,10 @@ public class AssetSetter {
     	gp.obj[i] = new OBJ_Armor(gp);
     	gp.obj[i].worldX = gp.tileSize*15;
     	gp.obj[i].worldY = gp.tileSize*4;
+    	i++;
+    	gp.obj[i] = new OBJ_Katana(gp);
+    	gp.obj[i].worldX = gp.tileSize*15;
+    	gp.obj[i].worldY = gp.tileSize*2;
     	i++;
     	
     }
