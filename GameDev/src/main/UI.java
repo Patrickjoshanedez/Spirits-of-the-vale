@@ -133,34 +133,26 @@ public class UI {
     }
 
     public void drawMessage() {
-        int messageX = gp.tileSize;
-        int messageY = gp.tileSize * 4;
-        g2.setFont(g2.getFont().deriveFont(Font.BOLD, 20F));
-
-        for (int i = 0; i < message.size(); i++) {
-            if (message.get(i) != null) {
-                String msg = message.get(i);
-
-                // Draw shadow
-                g2.setColor(Color.black);
-                g2.drawString(msg, messageX + 3, messageY + 3); // Slight offset for the shadow
-
-                // Draw main text
-                g2.setColor(Color.white);
-                g2.drawString(msg, messageX, messageY);
-
-                // Update message counter
-                int counter = messageCounter.get(i) + 1;
-                messageCounter.set(i, counter);
-                messageY += 50;
-
-               
-                
-            }
-        }
+    	int messageX = gp.tileSize;
+    	int messageY = gp.tileSize*4;
+    	g2.setFont(g2.getFont().deriveFont(Font.BOLD, 20F));
+    	
+    	for (int i = 0 ; i < message.size(); i++) {
+    		if (message.get(i) != null) {
+    			g2.setColor(Color.white);
+    			g2.drawString(message.get(i), messageX, messageY);
+    			
+    			int counter = messageCounter.get(i) + 1; // messageCounter++
+    			messageCounter.set(i, counter); // set the counter to the array
+    			messageY += 50;
+    			
+    			if(messageCounter.get(i) > 180) {
+    				message.remove(i);
+    				messageCounter.remove(i);
+    			}
+    		}
+    	}
     }
-
-
     // draw game over screen
     private void drawGameOverScreen() {
         g2.setColor(new Color(0, 0, 0, 150)); // Semi-transparent black
@@ -314,7 +306,7 @@ public class UI {
         int height = gp.tileSize * 4; // Height of the dialogue box
 
         // Draw the background rectangle for the dialogue box
-        drawSubWindow(x, y, width, height);
+        drawSubWindow(x, y, width, height);		
 
         g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 25));
         x += gp.tileSize; // Adjust x position for padding
@@ -363,6 +355,10 @@ public class UI {
     	g2.drawString("EXP", textX, textY);
     	textY += lineHeight;
     	g2.drawString("Next Level", textX, textY);
+    	textY += lineHeight + 20;
+    	g2.drawString("Weapon", textX, textY);
+    	textY += lineHeight + 15;
+    	g2.drawString("Armor", textX, textY);
     	textY += lineHeight;
     	
     	//VALUES
@@ -411,6 +407,11 @@ public class UI {
     	textX = getXforAlightToRightText(value, tailX);
     	g2.drawString(value, textX, textY);
     	textY += lineHeight;
+    	
+    	g2.drawImage(gp.player.currentWeapon.down1, tailX - gp.tileSize, textY - 13, null);
+    	textY += gp.tileSize;
+    	g2.drawImage(gp.player.currentArmor.down1, tailX - gp.tileSize, textY - 13, null);
+    	
     	
     	
     	
