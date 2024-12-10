@@ -275,8 +275,8 @@ String text;
         
     public void contactMonster(int i) {
         if (i != 999) {
-            if (invincible == false) {
-            	
+            if (invincible == false && gp.monster[i].dying == false) {
+
             	int damage = gp.monster[i].attack - defense;
     			if (damage < 0 ) {
     				damage = 0;
@@ -347,7 +347,8 @@ String text;
     			defense = getDefense();
     		}
     		if(selectedItem.type == type_consumable) {
-    			//later
+    			selectedItem.use(this);
+    			inventory.remove(itemIndex);
     		}
     	}
     }

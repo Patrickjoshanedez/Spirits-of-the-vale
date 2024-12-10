@@ -5,6 +5,8 @@ import monster.MON_AdikEye;
 import monster.MON_RedSlime;
 import object.OBJ_Armor;
 import object.OBJ_Door;
+import object.OBJ_GoldenArmor;
+import object.OBJ_HealingPotion;
 import object.OBJ_Katana;
 
 
@@ -25,6 +27,14 @@ public class AssetSetter {
     	i++;
     	gp.obj[i] = new OBJ_Katana(gp);
     	gp.obj[i].worldX = gp.tileSize*15;
+    	gp.obj[i].worldY = gp.tileSize*2;
+    	i++;
+    	gp.obj[i] = new OBJ_GoldenArmor(gp);
+    	gp.obj[i].worldX = gp.tileSize*16;
+    	gp.obj[i].worldY = gp.tileSize*2;
+    	i++;
+    	gp.obj[i] = new OBJ_HealingPotion(gp);
+    	gp.obj[i].worldX = gp.tileSize*18;
     	gp.obj[i].worldY = gp.tileSize*2;
     	i++;
     	

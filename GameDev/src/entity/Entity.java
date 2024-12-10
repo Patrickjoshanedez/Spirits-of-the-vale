@@ -37,6 +37,7 @@ public class Entity {
     public boolean alive = true;
     public boolean dying = false;
     public boolean hpBarOn = false;
+    
      
     //COUNTER
     public int spriteCounter = 0;
@@ -107,7 +108,9 @@ public class Entity {
                 break;
         }
     }
-
+    public void use(Entity entity) {
+    	
+    }
     public void update() {
         setAction();
         collisionOn = false;
@@ -239,25 +242,32 @@ public class Entity {
                worldY - gp.tileSize < gp.player.worldY + gp.player.screenY;
     }
     
-public void dyingAnimation(Graphics2D g2) {
-    	
-    	dyingCounter++;
-    	int i = 5;
-    	if (dyingCounter <= i) {changeAlpha(g2, 0f);}
-    	if (dyingCounter > i && dyingCounter <= i*2) {changeAlpha(g2, 1f); }
-    	if (dyingCounter > i*2 && dyingCounter <= i*3) {changeAlpha(g2, 0f); }
-    	if (dyingCounter > i*3 && dyingCounter <= i*4) {changeAlpha(g2, 1f); }
-    	if (dyingCounter > i*4 && dyingCounter <= i*5) {changeAlpha(g2, 0f); }
-    	if (dyingCounter > i*5 && dyingCounter <= i*6) {changeAlpha(g2, 1f); }
-    	if (dyingCounter > i*6 && dyingCounter <= i*7) {changeAlpha(g2, 0f); }
-    	if (dyingCounter > i*7 && dyingCounter <= i*8) {changeAlpha(g2, 1f); }
-    	if(dyingCounter > i*8) {
-    		gp.playSE(8);
-    		dying = false;
-    		alive = false;
-    	}
-    	
+    private boolean soundPlayed = false; // Add a flag to track sound playback
+
+    public void dyingAnimation(Graphics2D g2) {
+        dyingCounter++;
+        int i = 5;
+
+        if (dyingCounter <= i) { changeAlpha(g2, 0f); }
+        if (dyingCounter > i && dyingCounter <= i * 2) { changeAlpha(g2, 1f); }
+        if (dyingCounter > i * 2 && dyingCounter <= i * 3) { changeAlpha(g2, 0f); }
+        if (dyingCounter > i * 3 && dyingCounter <= i * 4) { changeAlpha(g2, 1f); }
+        if (dyingCounter > i * 4 && dyingCounter <= i * 5) { changeAlpha(g2, 0f); }
+        if (dyingCounter > i * 5 && dyingCounter <= i * 6) { changeAlpha(g2, 1f); }
+        if (dyingCounter > i * 6 && dyingCounter <= i * 7) { changeAlpha(g2, 0f); }
+        if (dyingCounter > i * 7 && dyingCounter <= i * 8) { changeAlpha(g2, 1f); }
+
+        if (dyingCounter > i * 8) {
+            alive = false;
+        }
+
+        // Play sound only once
+        if (!soundPlayed) {
+            gp.playSE(8);
+            soundPlayed = true; // Set the flag to true after playing the sound
+        }
     }
+
 
     public BufferedImage setup(String imagePath, int width, int height) {
         UtilityTool uTool = new UtilityTool();
