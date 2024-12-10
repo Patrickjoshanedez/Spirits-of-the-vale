@@ -4,6 +4,7 @@ import java.util.Random;
 
 import entity.Entity;
 import main.GamePanel;
+import object.OBJ_HealingPotion;
 	
 public class MON_RedSlime extends Entity {
 	GamePanel gp;
@@ -15,9 +16,9 @@ public class MON_RedSlime extends Entity {
         speed = 1;
         maxLife = 4;
         life = maxLife;
-        attack = 5;
+        attack = 3;
         defense = 0;
-        exp = 2;
+        exp = 1;
 
         solidArea.x = 3;
         solidArea.y = 18;
@@ -69,6 +70,14 @@ public class MON_RedSlime extends Entity {
     	actionLockCounter = 0;
     	direction = gp.player.direction;
     	
+    }
+    public void checkDrop() {
+    	int i = new Random().nextInt(150)+1;
+    	
+    	//SET MONSTER DROP
+    	if (i < 50) {
+    		dropItem(new OBJ_HealingPotion(gp));
+    	}
     }
 }
 

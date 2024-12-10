@@ -73,15 +73,15 @@ public class EventHandler {
     	}
     	
     	if(canTouchEvent == true) {
-    		// Check for pit damage event
-            if (hit(4, 1, "any")) {
-                if (canTakeDamage) {
-                    damagePit(gp.dialogueState);
-                    canTakeDamage = false;
-                    damageCooldown = 60; // 1 second at 60 FPS
-                    canTouchEvent = false;
-                }
-            }
+//    		// Check for pit damage event
+//            if (hit(4, 1, "any")) {
+//                if (canTakeDamage) {
+//                    damagePit(gp.dialogueState);
+//                    canTakeDamage = false;
+//                    damageCooldown = 60; // 1 second at 60 FPS
+//                    canTouchEvent = false;
+//                }
+//            }
             
             // Proximity to water fountain
             if (isNear(45, 4, 2)) { // Tile (45, 4) with a proximity range of 2
@@ -89,7 +89,7 @@ public class EventHandler {
             }
 
             // Check for healing pool event
-            if (hit(45, 4, "any")) {
+            if (hit(70, 31, "any")) {
                 healingPool(gp.dialogueState);
             }	
             
@@ -103,7 +103,7 @@ public class EventHandler {
             }
 
             // Rock block event with cooldown check
-            if (hit(16, 12, "left") || hit(16, 13, "left")) {
+            if (hit(31, 39, "left") || hit(41, 40, "left")) {
                 if (!rockBlockCooldown) {
                     rockBlock(gp.dialogueState);
                     rockBlockCooldown = true;
@@ -121,21 +121,21 @@ public class EventHandler {
             }
 
             // Modify door event checks to include cooldown
-            if (hit(22, 8, "up")) {
+            if (hit(47, 35, "up")) {
                 if (!doorCooldown) {
                     doorEvent(gp.dialogueState);
                     doorCooldown = true;
                     doorCooldownCounter = 0;
                 }
             }
-            if (hit(10, 41, "up")) {
+            if (hit(35, 68, "up")) {
                 if (!doorCooldown) {
                     doorEvent(gp.dialogueState);
                     doorCooldown = true;
                     doorCooldownCounter = 0;
                 }
             }
-            if (hit(19, 44, "up")) {
+            if (hit(44, 71, "up")) {
                 if (!doorCooldown) {
                     doorEvent(gp.dialogueState);
                     doorCooldown = true;
@@ -143,7 +143,7 @@ public class EventHandler {
                 }
             }
             // Teleportation Orb Event
-            if (hit(46, 46, "any")) {
+            if (hit(71, 73, "any")) {
                 if (!orbCooldown) {
                     teleportationOrbEvent1(gp.dialogueState);
                     orbCooldown = true;
@@ -151,13 +151,22 @@ public class EventHandler {
                 }
             }
             // Teleportation Orb Event return
-            if (hit(10, 13, "any")) {
+            if (hit(35, 40, "any")) {
                 if (!orbCooldown) {
                     teleportationOrbEvent(gp.dialogueState);
                     orbCooldown = true;
                     orbCooldownCounter = 0;
                 }
             }
+            // Teleportation Orb Event
+            if (hit(39, 75, "any")) {
+                if (!orbCooldown) {
+                    teleportationOrbEvent2(gp.dialogueState);
+                    orbCooldown = true;
+                    orbCooldownCounter = 0;
+                }
+            }
+            
     	}
         
         // Cooldown logic
@@ -239,15 +248,15 @@ public class EventHandler {
         if (!fountainEventTriggered) {
             gp.gameState = gp.dialogueState;
             gp.ui.currentDialogue = "You hear the soothing sound of water...\n" +
-                                    "The fountain seems to beckon you.\n" +
-                                    "Press Enter to interact.";
+                                    "The fountain seems to beckon you.\n";
+                                   
             fountainEventTriggered = true; // Mark the event as triggered
         }
 
         // Handle Enter key press to trigger the healing pool event
         if (gp.keyH.enterPressed) {
             // Only allow entering if the player is pressing enter to trigger healing
-            if (isNear(45, 4, 2)) {
+            if (isNear(69, 33, 6)) {
                 healingPool(gp.dialogueState);
             }
             gp.keyH.enterPressed = false; // Reset enterPressed flag
@@ -327,7 +336,7 @@ public class EventHandler {
             gp.ui.currentDialogue = "You have taken a sip from this\n mysterious fountain. Fortunately, it \nfills you with vitality.";
             // Heal the player
             int maxLife = gp.player.maxLife;
-            gp.player.life = Math.min(gp.player.life + 1, maxLife);
+            gp.player.life = Math.min(gp.player.life + maxLife, maxLife);
             gp.aSetter.setMonster();
 
             // Play healing sound
@@ -373,8 +382,8 @@ public class EventHandler {
                                  "shift in reality...";
 
         // Teleport player to a specific location
-        gp.player.worldX = gp.tileSize * 10; // Example X coordinate
-        gp.player.worldY = gp.tileSize * 13; // Example Y coordinate
+        gp.player.worldX = gp.tileSize * 35; // Example X coordinate
+        gp.player.worldY = gp.tileSize * 40; // Example Y coordinate
 
         // Optional: Play teleportation sound
         gp.playSE(5); // Assuming sound effect index 5 is for teleportation
@@ -396,8 +405,30 @@ public class EventHandler {
                                  "shift in reality...";
 
         // Teleport player to a specific location
-        gp.player.worldX = gp.tileSize * 46; // Example X coordinate
-        gp.player.worldY = gp.tileSize * 46; // Example Y coordinate
+        gp.player.worldX = gp.tileSize * 71; // Example X coordinate
+        gp.player.worldY = gp.tileSize * 73; // Example Y coordinate
+
+        // Optional: Play teleportation sound
+        gp.playSE(5); // Assuming sound effect index 5 is for teleportation
+    }
+    public void teleportationOrbEvent2(int gameState) {
+        // Null checks
+        if (gp == null || gp.ui == null || gp.player == null) {
+            System.err.println("Critical error: Game components are null");
+            return;
+        }
+
+        // Set game state to dialogue
+        gp.gameState = gameState;
+
+        // Teleportation dialogue
+        gp.ui.currentDialogue = "A mystical orb pulses with energy.\n" +
+                                 "As you touch it, you feel a sudden\n" +
+                                 "shift in reality...";
+
+        // Teleport player to a specific location
+        gp.player.worldX = gp.tileSize * 89; // Example X coordinate
+        gp.player.worldY = gp.tileSize * 29; // Example Y coordinate
 
         // Optional: Play teleportation sound
         gp.playSE(5); // Assuming sound effect index 5 is for teleportation

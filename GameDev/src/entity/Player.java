@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import main.GamePanel;
 import main.KeyHandler;
 import object.OBJ_Armor;
+import object.OBJ_Eyeatk;
 import object.OBJ_Key;
 import object.OBJ_Sword;
 
@@ -54,9 +55,9 @@ public class Player extends Entity {
     }
 
     public void setDefaultValues() {
-        worldX = gp.tileSize * 2; // Starting X position
-        worldY = gp.tileSize * 3; // Starting Y position
-        speed = 4;                 // Movement speed
+        worldX = gp.tileSize * 27; // Starting X position
+        worldY = gp.tileSize * 30; // Starting Y position
+        speed = 6;                 // Movement speed
         direction = "down";        // Default direction
         
         
@@ -67,9 +68,10 @@ public class Player extends Entity {
         strength = 1;
         dexterity = 1;
         exp = 0;
-        nextLevelExp = 5;
+        nextLevelExp = 8;
         currentWeapon = new OBJ_Sword(gp); 
         currentArmor = new OBJ_Armor(gp);
+        projectile = new OBJ_Eyeatk(gp);
         attack = getAttack();
         defense = getDefense();
     }
@@ -189,6 +191,18 @@ public class Player extends Entity {
                 invincible = false;
                 invincibleCounter = 0;
             }
+        }
+        
+        if(gp.keyH.shotKeyPressed == true && projectile.alive == false && shotAvailableCounter == 30) {
+        	// SET DEFAULT COORDINATES
+            projectile.set(worldX, worldY, direction, true, this);
+            
+            gp.projectileList.add(projectile);
+        }
+        
+        
+        if (shotAvailableCounter < 30) {	
+        	shotAvailableCounter++;
         }
 
         System.out.println("Player update called. Game state: " + gp.gameState);
@@ -317,7 +331,7 @@ String text;
     	if (exp >= nextLevelExp) {
     		level++;
     		nextLevelExp = nextLevelExp*2;
-    		maxLife += 2;
+    		maxLife += 1;
     		strength++;
     		dexterity++;
     		attack = getAttack();

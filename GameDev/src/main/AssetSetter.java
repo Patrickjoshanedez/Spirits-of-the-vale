@@ -22,16 +22,16 @@ public class AssetSetter {
 
     	int i = 0;
     	gp.obj[i] = new OBJ_Armor(gp);
-    	gp.obj[i].worldX = gp.tileSize*15;
-    	gp.obj[i].worldY = gp.tileSize*4;
+    	gp.obj[i].worldX = gp.tileSize*90;
+    	gp.obj[i].worldY = gp.tileSize*26;
     	i++;
     	gp.obj[i] = new OBJ_Katana(gp);
-    	gp.obj[i].worldX = gp.tileSize*15;
-    	gp.obj[i].worldY = gp.tileSize*2;
+    	gp.obj[i].worldX = gp.tileSize*37;
+    	gp.obj[i].worldY = gp.tileSize*39;
     	i++;
     	gp.obj[i] = new OBJ_GoldenArmor(gp);
-    	gp.obj[i].worldX = gp.tileSize*16;
-    	gp.obj[i].worldY = gp.tileSize*2;
+    	gp.obj[i].worldX = gp.tileSize*89;
+    	gp.obj[i].worldY = gp.tileSize*26;
     	i++;
     	gp.obj[i] = new OBJ_HealingPotion(gp);
     	gp.obj[i].worldX = gp.tileSize*18;
@@ -42,8 +42,8 @@ public class AssetSetter {
 
     public void setNPC() {
         gp.npc[0] = new NPC_Mage1(gp);
-        gp.npc[0].worldX = gp.tileSize * 10;
-        gp.npc[0].worldY = gp.tileSize * 2;
+        gp.npc[0].worldX = gp.tileSize * 43;
+        gp.npc[0].worldY = gp.tileSize * 36;
         
         
 
@@ -51,21 +51,71 @@ public class AssetSetter {
     public void setMonster() {
     	int i = 0;
     	gp.monster[i] = new MON_RedSlime(gp);
-        gp.monster[i].worldX = gp.tileSize * 10;
-        gp.monster[i].worldY = gp.tileSize * 4;
+        gp.monster[i].worldX = gp.tileSize * 66;
+        gp.monster[i].worldY = gp.tileSize * 31;
         i++;
-        gp.monster[i] = new MON_AdikEye(gp);
-        gp.monster[i].worldX = gp.tileSize * 11;
-        gp.monster[i].worldY = gp.tileSize * 5;
+    	gp.monster[i] = new MON_RedSlime(gp);
+        gp.monster[i].worldX = gp.tileSize * 60;
+        gp.monster[i].worldY = gp.tileSize * 31;
         i++;
-        gp.monster[i] = new MON_AdikEye(gp);
-        gp.monster[i].worldX = gp.tileSize * 15;
-        gp.monster[i].worldY = gp.tileSize * 5;
+    	gp.monster[i] = new MON_RedSlime(gp);
+        gp.monster[i].worldX = gp.tileSize * 60;
+        gp.monster[i].worldY = gp.tileSize * 32;
+        i++;
+    	gp.monster[i] = new MON_RedSlime(gp);
+        gp.monster[i].worldX = gp.tileSize * 57;
+        gp.monster[i].worldY = gp.tileSize * 30;
         i++;
         gp.monster[i] = new MON_RedSlime(gp);
-        gp.monster[i].worldX = gp.tileSize * 13;
-        gp.monster[i].worldY = gp.tileSize * 4;
+        gp.monster[i].worldX = gp.tileSize * 10;
+        gp.monster[i].worldY = gp.tileSize * 29;
         i++;
+        gp.monster[i] = new MON_RedSlime(gp);
+        gp.monster[i].worldX = gp.tileSize * 10;
+        gp.monster[i].worldY = gp.tileSize * 27;
+        i++;
+        gp.monster[i] = new MON_AdikEye(gp);
+        gp.monster[i].worldX = gp.tileSize * 66;
+        gp.monster[i].worldY = gp.tileSize * 44;
+        i++;
+        gp.monster[i] = new MON_AdikEye(gp);
+        gp.monster[i].worldX = gp.tileSize * 66;
+        gp.monster[i].worldY = gp.tileSize * 67;
+        i++;
+        gp.monster[i] = new MON_AdikEye(gp);
+        gp.monster[i].worldX = gp.tileSize * 66;
+        gp.monster[i].worldY = gp.tileSize * 65;
+        i++;
+        gp.monster[i] = new MON_AdikEye(gp);
+        gp.monster[i].worldX = gp.tileSize * 66;
+        gp.monster[i].worldY = gp.tileSize * 63;
+        i++;
+       
+        gp.monster[i] = new MON_RedSlime(gp);
+        gp.monster[i].worldX = gp.tileSize * 28;
+        gp.monster[i].worldY = gp.tileSize * 38;
+        i++;
+        gp.monster[i] = new MON_RedSlime(gp);
+        gp.monster[i].worldX = gp.tileSize * 27;
+        gp.monster[i].worldY = gp.tileSize * 38;
+        i++;
+        gp.monster[i] = new MON_RedSlime(gp);
+        gp.monster[i].worldX = gp.tileSize * 33;
+        gp.monster[i].worldY = gp.tileSize * 74;
+        i++;
+        gp.monster[i] = new MON_RedSlime(gp);
+        gp.monster[i].worldX = gp.tileSize * 37;
+        gp.monster[i].worldY = gp.tileSize * 74;
+        i++;
+        gp.monster[i] = new MON_RedSlime(gp);
+        gp.monster[i].worldX = gp.tileSize * 35;
+        gp.monster[i].worldY = gp.tileSize * 74;
+        i++;
+        gp.monster[i] = new MON_AdikEye(gp);
+        gp.monster[i].worldX = gp.tileSize * 29;
+        gp.monster[i].worldY = gp.tileSize * 60;
+        i++;
+
     }
 
 }

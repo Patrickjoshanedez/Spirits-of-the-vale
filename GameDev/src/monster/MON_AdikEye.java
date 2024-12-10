@@ -4,6 +4,8 @@ import java.util.Random;
 
 import entity.Entity;
 import main.GamePanel;
+import object.OBJ_Eyeatk;
+import object.OBJ_HealingPotion;
 
 public class MON_AdikEye extends Entity {
     GamePanel gp;
@@ -16,7 +18,8 @@ public class MON_AdikEye extends Entity {
         speed = 1; // Slightly faster than Red Slime
         maxLife = 5; // More life than Red Slime
         life = maxLife;
-        exp = 3;
+        exp = 2;
+        projectile = new OBJ_Eyeatk(gp);
 
         solidArea.x = 5;
         solidArea.y = 5;
@@ -59,6 +62,23 @@ public class MON_AdikEye extends Entity {
                 direction = "right";
             }
             actionLockCounter = 0;
+            
         }
+        
+        int i = new Random().nextInt(100)+1;
+        if (i > 99 && projectile.alive == false && shotAvailableCounter == 30) {
+        	projectile.set(worldX, worldY, direction, true, this);
+        	gp.projectileList.add(projectile);
+        	shotAvailableCounter = 0;
+        }
+    }
+    
+    public void checkDrop() {
+    	int i = new Random().nextInt(150)+1;
+    	
+    	//SET MONSTER DROP
+    	if (i < 75) {
+    		dropItem(new OBJ_HealingPotion(gp));
+    	}
     }
 }

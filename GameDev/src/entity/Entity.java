@@ -45,6 +45,7 @@ public class Entity {
     public int invincibleCounter = 0;
     int dyingCounter = 0;
     public int hpBarCounter = 0;
+    public int shotAvailableCounter = 0;
     
     // CHARACTER STATUS
     public String name;
@@ -60,11 +61,13 @@ public class Entity {
     public int dexterity;
     public Entity currentWeapon;
     public Entity currentArmor;
+    public Projectile projectile;
     
     //item attributes
     public int attackValue;
     public int defenseValue;
     public String description = "";
+    public int useCost;
     
     public int type;
     public final int type_player = 0;
@@ -111,6 +114,19 @@ public class Entity {
     public void use(Entity entity) {
     	
     }
+    public void checkDrop() {
+    	
+    }
+    public void dropItem(Entity droppedItem) {
+    	for (int i = 0; i < gp.obj.length; i++) {
+    		if(gp.obj[i] == null) {
+    			gp.obj[i] = droppedItem;
+    			gp.obj[i].worldX = worldX;
+    			gp.obj[i].worldY = worldY;
+    			break;
+    		}
+    	}
+    }
     public void update() {
         setAction();
         collisionOn = false;
@@ -123,10 +139,7 @@ public class Entity {
         
         
         if(this.type == type_monster && contactPlayer == true) {
-        	if(gp.player.invincible == false) {
-        		gp.player.life -= 1;
-        		gp.player.invincible = true;
-        	}
+        	damagePlayer(attack);
         }
         
 
@@ -149,7 +162,13 @@ public class Entity {
         }
         
     }
-
+    
+    public void damagePlayer(int attack) {
+    	if(gp.player.invincible == false) {
+    		gp.player.life -= 1;
+    		gp.player.invincible = true;
+    	}
+    }
     public void draw(Graphics2D g2) {
         BufferedImage image = null;
 
@@ -185,44 +204,49 @@ public class Entity {
             }
             
            
-            // Calculate offsets for non-standard sprite sizes (e.g., attack sprites)
-            int drawWidth = image.getWidth();   // Use the sprite's width
-            int drawHeight = image.getHeight(); // Use the sprite's height
-            int drawX = screenX - (drawWidth - gp.tileSize) / 2; // Center horizontally
-            int drawY = screenY - (drawHeight - gp.tileSize);    // Adjust vertically for taller sprites
-
+            try {
+                // Calculate offsets for non-standard sprite sizes (e.g., attack sprites)
+                int drawWidth = image.getWidth();   // Use the sprite's width
+                int drawHeight = image.getHeight(); // Use the sprite's height
+                int drawX = screenX - (drawWidth - gp.tileSize) / 2; // Center horizontally
+                int drawY = screenY - (drawHeight - gp.tileSize);    // Adjust vertically for taller sprites
+               
+                
+                // MONSTER HP BAR
+                if (type == 2 && hpBarOn == true) {
+                
+                double oneScale = (double)gp.tileSize/maxLife;
+                double hpBarValue = oneScale*life;
+                	
+                g2.setColor(new Color(35, 35, 35));
+                g2.fillRect(screenX - 1, screenY - 16, gp.tileSize+2, 12);
+                
+                g2.setColor(new Color(255, 0, 30));
+                g2.fillRect(screenX, screenY - 15, (int)hpBarValue, 10);
+                
+                hpBarCounter++;
+                if(hpBarCounter > 600) {
+                	hpBarCounter = 0;
+                	hpBarOn = false;
+                	}
+                }
+                
+                if (invincible == true) {
+                	hpBarOn = true;
+        			hpBarCounter = 0;
+                }
+                if (dying == true) {
+                	dyingAnimation(g2);
+                }
+                // Draw the image
+                g2.drawImage(image, drawX, drawY, drawWidth, drawHeight, null);
+                
+                changeAlpha(g2, 1f);
             
-            // MONSTER HP BAR
-            if (type == 2 && hpBarOn == true) {
-            
-            double oneScale = (double)gp.tileSize/maxLife;
-            double hpBarValue = oneScale*life;
-            	
-            g2.setColor(new Color(35, 35, 35));
-            g2.fillRect(screenX - 1, screenY - 16, gp.tileSize+2, 12);
-            
-            g2.setColor(new Color(255, 0, 30));
-            g2.fillRect(screenX, screenY - 15, (int)hpBarValue, 10);
-            
-            hpBarCounter++;
-            if(hpBarCounter > 600) {
-            	hpBarCounter = 0;
-            	hpBarOn = false;
-            	}
+            }catch(Exception e) {
+         	   System.out.println("image null");
             }
-            
-            if (invincible == true) {
-            	hpBarOn = true;
-    			hpBarCounter = 0;
             }
-            if (dying == true) {
-            	dyingAnimation(g2);
-            }
-            // Draw the image
-            g2.drawImage(image, drawX, drawY, drawWidth, drawHeight, null);
-            
-            changeAlpha(g2, 1f);
-        }
         
         
         
@@ -305,6 +329,9 @@ public class Entity {
                 invincible = false;
                 invincibleCounter = 0;
             }
+        }
+        if (shotAvailableCounter < 30) {
+        	shotAvailableCounter++;
         }
 
 

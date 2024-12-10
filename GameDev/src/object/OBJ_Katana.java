@@ -10,8 +10,8 @@ public class OBJ_Katana extends Entity{
 		type = type_katana;
 		name = "Katana";
         down1 = setup("/objects/katana", gp.tileSize, gp.tileSize);
-        attackValue = 3;
-        description = "{" + name + "}\nFinally something sharper!";
+        attackValue = 2;
+        description = "{" + name + "}\nFinally something sharper!\nDAMAGE: 3";
         collision = false;
         isStatic = true;
         //range
