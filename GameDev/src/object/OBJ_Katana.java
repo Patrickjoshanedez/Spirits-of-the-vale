@@ -7,7 +7,7 @@ public class OBJ_Katana extends Entity{
 
 	public OBJ_Katana(GamePanel gp) {
 		super(gp);
-//		type = type_katana;
+		type = type_katana;
 		name = "Katana";
         down1 = setup("/objects/katana", gp.tileSize, gp.tileSize);
         attackValue = 3;

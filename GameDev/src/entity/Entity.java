@@ -47,7 +47,6 @@ public class Entity {
     
     // CHARACTER STATUS
     public String name;
-    public int type; 
     public int speed;
     public int maxLife;
     public int life;
@@ -66,6 +65,14 @@ public class Entity {
     public int defenseValue;
     public String description = "";
     
+    public int type;
+    public final int type_player = 0;
+    public final int type_npc = 1;
+    public final int type_monster = 2;
+    public final int type_sword = 3;
+    public final int type_katana = 4;
+    public final int type_armor = 5;
+    public final int type_consumable = 6;
 
     public Entity(GamePanel gp) {
         this.gp = gp;
@@ -112,7 +119,7 @@ public class Entity {
         boolean contactPlayer = gp.cChecker.checkPlayer(this);
         
         
-        if(this.type == 2 && contactPlayer == true) {
+        if(this.type == type_monster && contactPlayer == true) {
         	if(gp.player.invincible == false) {
         		gp.player.life -= 1;
         		gp.player.invincible = true;

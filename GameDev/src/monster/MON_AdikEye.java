@@ -11,7 +11,7 @@ public class MON_AdikEye extends Entity {
     public MON_AdikEye(GamePanel gp) {
         super(gp);
         this.gp = gp;
-        type = 2; // Assuming a new type for AdikEye
+        type = type_monster; // Assuming a new type for AdikEye
         name = "Adik Eye";
         speed = 1; // Slightly faster than Red Slime
         maxLife = 5; // More life than Red Slime

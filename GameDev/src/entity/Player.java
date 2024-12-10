@@ -330,7 +330,27 @@ String text;
     	}
     }
     
-    
+    public void selectItem() {
+    	int itemIndex = gp.ui.getItemIndexOnSlot();
+    	
+    	if(itemIndex < inventory.size()) {
+    		
+    		Entity selectedItem = inventory.get(itemIndex);
+    		
+    		if(selectedItem.type == type_sword || selectedItem.type == type_katana) {
+    			
+    			currentWeapon = selectedItem;
+    			attack = getAttack();
+    		}
+    		if(selectedItem.type == type_armor) {
+    			currentArmor = selectedItem;
+    			defense = getDefense();
+    		}
+    		if(selectedItem.type == type_consumable) {
+    			//later
+    		}
+    	}
+    }
     public void draw(Graphics2D g2) {
         BufferedImage image = null;
         
