@@ -75,7 +75,18 @@ public class Player extends Entity {
         attack = getAttack();
         defense = getDefense();
     }
+    public void setDefaultPositions()
+    {
+        worldX = gp.tileSize * 27;
+        worldY = gp.tileSize * 30;
+        direction = "down";
+    }
+    public void restoreLife() {
+    	life = maxLife;
+    	invincible = false;
+    }
     	public void setItems() {
+    		inventory.clear();
     		inventory.add(currentWeapon);
     		inventory.add(currentArmor);
     		inventory.add(new OBJ_Key(gp));
@@ -203,6 +214,14 @@ public class Player extends Entity {
         
         if (shotAvailableCounter < 30) {	
         	shotAvailableCounter++;
+        }
+        
+        if(life <= 0)
+        {
+            gp.gameState = gp.gameOverState;
+            gp.ui.commandNum =- 1; //for if you die while pressing enter
+            gp.stopMusic();
+            gp.playSE(11);
         }
 
         System.out.println("Player update called. Game state: " + gp.gameState);

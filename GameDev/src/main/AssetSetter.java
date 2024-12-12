@@ -2,6 +2,7 @@ package main;
 
 import entity.NPC_Mage1;
 import monster.MON_AdikEye;
+import monster.MON_FinalBoss;
 import monster.MON_RedSlime;
 import object.OBJ_Armor;
 import object.OBJ_Door;
@@ -50,6 +51,10 @@ public class AssetSetter {
     }
     public void setMonster() {
     	int i = 0;
+    	gp.monster[i] = new MON_FinalBoss(gp);
+        gp.monster[i].worldX = gp.tileSize * 21;
+        gp.monster[i].worldY = gp.tileSize * 21;
+        i++;
     	gp.monster[i] = new MON_RedSlime(gp);
         gp.monster[i].worldX = gp.tileSize * 66;
         gp.monster[i].worldY = gp.tileSize * 31;

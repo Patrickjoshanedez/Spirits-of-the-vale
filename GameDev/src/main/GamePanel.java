@@ -55,6 +55,7 @@ public class GamePanel extends JPanel implements Runnable {
     public AssetSetter aSetter = new AssetSetter(this);
     public UI ui = new UI(this);
     public EventHandler eHandler = new EventHandler(this);
+    Config config = new Config(this);
     Thread gameThread;
     
     // ENTITY and OBJECT
@@ -62,7 +63,7 @@ public class GamePanel extends JPanel implements Runnable {
     public Entity obj[] = new Entity[15]; // Initialize obj array
     public Entity npc[] = new Entity[10];
     public Entity monster[] = new Entity[20];
-    public ArrayList<Entity> projectileList = new ArrayList<>();
+    public ArrayList<Entity> projectileList = new ArrayList<>(); //DSa
     ArrayList<Entity> entityList = new ArrayList<>();
     
     
@@ -100,8 +101,24 @@ public class GamePanel extends JPanel implements Runnable {
         tempScreen = new BufferedImage(screenWidth, screenHeight, BufferedImage.TYPE_INT_ARGB);
         g2 = (Graphics2D)tempScreen.getGraphics();
         
-//        setFullScreen();
-        
+        if(fullScreenOn == true) {
+        setFullScreen();
+        }
+    }
+    public void retry() {
+    	player.setDefaultPositions();
+    	player.restoreLife();
+    	aSetter.setNPC();
+    	aSetter.setMonster();
+    }
+    public void restart() {
+    	player.setDefaultPositions();
+    	player.setDefaultValues();
+    	player.restoreLife();
+    	player.setItems();
+    	aSetter.setObject();
+    	aSetter.setMonster();
+    	aSetter.setNPC();
     }
     
     public void setFullScreen() {

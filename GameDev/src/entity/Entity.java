@@ -12,42 +12,50 @@ import main.UtilityTool;
 
 public class Entity {
 
-    
-    
-    public boolean isStatic = false; // Flag to check if the entity is static (no animation)
+    // Flag to check if the entity is static (non-animated)
+    public boolean isStatic = false; 
 
     GamePanel gp;
+
+    // Sprite images for different directions and actions
     public BufferedImage up1, up2, up3, down1, down2, down3, left1, left2, left3, right1, right2, right3;
-    public BufferedImage attackUp1,  attackUp2,  attackUp3,  attackDown1, attackDown2, attackDown3, attackRight1,  attackRight2, attackRight3, attackLeft1, attackLeft2, attackLeft3;
+    public BufferedImage attackUp1, attackUp2, attackUp3, attackDown1, attackDown2, attackDown3;
+    public BufferedImage attackRight1, attackRight2, attackRight3, attackLeft1, attackLeft2, attackLeft3;
     public BufferedImage image, image2, image3;
+
+    // Collision areas for the entity
     public Rectangle solidArea = new Rectangle(0, 0, 48, 48);
     public Rectangle attackArea = new Rectangle(0, 0, 0, 0);
     public int solidAreaDefaultX, solidAreaDefaultY;
-    public String[] dialogue = new String[20]; // Initialize dialogue array
+
+    // Dialogue array to hold entity conversations
+    public String[] dialogue = new String[20];
+
+    // Flags and states
     public boolean collision = false;
     public boolean attackCanceled = false;
-    //STATE
+    public boolean collisionOn = false;
+    public boolean invincible = false;
+    public boolean attacking = false;
+    public boolean alive = true;
+    public boolean dying = false;
+    public boolean hpBarOn = false;
+
+    // Entity position and direction
     public int worldX, worldY;
     public String direction = "down";
     public int spriteNum = 1;
     public int dialogueIndex = 0;
-    public boolean collisionOn = false;
-    public boolean invincible = false;
-    boolean attacking = false; 
-    public boolean alive = true;
-    public boolean dying = false;
-    public boolean hpBarOn = false;
-    
-     
-    //COUNTER
+
+    // Counters for various states
     public int spriteCounter = 0;
     public int actionLockCounter = 0;
     public int invincibleCounter = 0;
-    int dyingCounter = 0;
+    public int dyingCounter = 0;
     public int hpBarCounter = 0;
     public int shotAvailableCounter = 0;
-    
-    // CHARACTER STATUS
+
+    // Character attributes
     public String name;
     public int speed;
     public int maxLife;
@@ -62,13 +70,14 @@ public class Entity {
     public Entity currentWeapon;
     public Entity currentArmor;
     public Projectile projectile;
-    
-    //item attributes
+
+    // Item attributes
     public int attackValue;
     public int defenseValue;
     public String description = "";
     public int useCost;
-    
+
+    // Entity types
     public int type;
     public final int type_player = 0;
     public final int type_npc = 1;
@@ -78,23 +87,27 @@ public class Entity {
     public final int type_armor = 5;
     public final int type_consumable = 6;
 
+    // Constructor
     public Entity(GamePanel gp) {
         this.gp = gp;
     }
 
+    // Define actions for the entity (to be overridden by subclasses)
     public void setAction() {
-        // Override in subclasses
-    }
-    public void damageReaction() {
-    	// Override in slime class
     }
 
+    // Define reaction to damage (to be overridden in specific entity classes)
+    public void damageReaction() {
+    }
+
+    // Handles entity dialogue and direction changes
     public void speak() {
         if (dialogue[dialogueIndex] == null) {
-            dialogueIndex = 0; // Reset to the first dialogue if out of bounds
+            dialogueIndex = 0;
         }
         gp.ui.currentDialogue = dialogue[dialogueIndex];
         dialogueIndex++;
+
         // Change direction based on player's direction
         switch (gp.player.direction) {
             case "up":
@@ -111,22 +124,28 @@ public class Entity {
                 break;
         }
     }
+
+    // Use an item or ability (to be implemented in specific cases)
     public void use(Entity entity) {
-    	
     }
+
+    // Check for item drops (to be implemented in specific cases)
     public void checkDrop() {
-    	
     }
+
+    // Drop an item at the entity's position
     public void dropItem(Entity droppedItem) {
-    	for (int i = 0; i < gp.obj.length; i++) {
-    		if(gp.obj[i] == null) {
-    			gp.obj[i] = droppedItem;
-    			gp.obj[i].worldX = worldX;
-    			gp.obj[i].worldY = worldY;
-    			break;
-    		}
-    	}
+        for (int i = 0; i < gp.obj.length; i++) {
+            if (gp.obj[i] == null) {
+                gp.obj[i] = droppedItem;
+                gp.obj[i].worldX = worldX;
+                gp.obj[i].worldY = worldY;
+                break;
+            }
+        }
     }
+
+    // Update the entity's state
     public void update() {
         setAction();
         collisionOn = false;
@@ -135,16 +154,16 @@ public class Entity {
         gp.cChecker.checkEntity(this, gp.npc);
         gp.cChecker.checkEntity(this, gp.monster);
         gp.cChecker.checkPlayer(this);
-        boolean contactPlayer = gp.cChecker.checkPlayer(this);
-        
-        
-        if(this.type == type_monster && contactPlayer == true) {
-        	damagePlayer(attack);
-        }
-        
 
-        // If no collision, move the entity
-        if (!collisionOn && !isStatic) { // Don't move if it's static
+        boolean contactPlayer = gp.cChecker.checkPlayer(this);
+
+        // Handle contact with player for monsters
+        if (this.type == type_monster && contactPlayer) {
+            damagePlayer(attack);
+        }
+
+        // Move entity if no collision and it's not static
+        if (!collisionOn && !isStatic) {
             switch (direction) {
                 case "up":
                     worldY -= speed;
@@ -160,33 +179,30 @@ public class Entity {
                     break;
             }
         }
-        
     }
-    
+
+    // Damage the player
     public void damagePlayer(int attack) {
-    	if(gp.player.invincible == false) {
-    		gp.player.life -= 1;
-    		gp.player.invincible = true;
-    	}
+        if (!gp.player.invincible) {
+            gp.player.life -= 1;
+            gp.player.invincible = true;
+        }
     }
+
+    // Draw the entity on the screen
     public void draw(Graphics2D g2) {
         BufferedImage image = null;
 
-        // Calculate screen position
+        // Calculate screen position relative to player
         int screenX = worldX - gp.player.worldX + gp.player.screenX;
         int screenY = worldY - gp.player.worldY + gp.player.screenY;
 
-        // Check if the entity is within the player's view
-        if (worldX + gp.tileSize > gp.player.worldX - gp.player.screenX &&
-            worldX - gp.tileSize < gp.player.worldX + gp.player.screenX &&
-            worldY + gp.tileSize > gp.player.worldY - gp.player.screenY &&
-            worldY - gp.tileSize < gp.player.worldY + gp.player.screenY) {
-
-            // Choose the appropriate sprite
+        // Check if the entity is within view
+        if (isInView()) {
+            // Choose sprite image based on entity state
             if (isStatic) {
-                image = down1; // Use a static image for non-animated objects
+                image = down1;
             } else {
-                // Determine sprite based on direction
                 switch (direction) {
                     case "up":
                         image = getSpriteImage(up1, up2, up3);
@@ -202,19 +218,17 @@ public class Entity {
                         break;
                 }
             }
-            
-           
+
             try {
-                // Calculate offsets for non-standard sprite sizes (e.g., attack sprites)
-                int drawWidth = image.getWidth();   // Use the sprite's width
-                int drawHeight = image.getHeight(); // Use the sprite's height
-                int drawX = screenX - (drawWidth - gp.tileSize) / 2; // Center horizontally
-                int drawY = screenY - (drawHeight - gp.tileSize);    // Adjust vertically for taller sprites
-               
-                
-                // MONSTER HP BAR
+                // Adjust position and size for sprites
+                int drawWidth = image.getWidth();
+                int drawHeight = image.getHeight();
+                int drawX = screenX - (drawWidth - gp.tileSize) / 2;
+                int drawY = screenY - (drawHeight - gp.tileSize);
+
+                // Draw monster HP bar if applicable
                 if (type == 2 && hpBarOn == true) {
-                
+                    
                 double oneScale = (double)gp.tileSize/maxLife;
                 double hpBarValue = oneScale*life;
                 	
@@ -251,22 +265,24 @@ public class Entity {
         
         
     }
-    
- 
-    
-    public void changeAlpha(Graphics2D g2, float alphaValue) {
-    	g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alphaValue));
-    }
-    
 
+    // Change the transparency of the graphics context. Encap
+    public void changeAlpha(Graphics2D g2, float alphaValue) {
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alphaValue));
+    }
+
+    // Check if the entity is within the player's view
     private boolean isInView() {
         return worldX + gp.tileSize > gp.player.worldX - gp.player.screenX &&
                worldX - gp.tileSize < gp.player.worldX + gp.player.screenX &&
                worldY + gp.tileSize > gp.player.worldY - gp.player.screenY &&
                worldY - gp.tileSize < gp.player.worldY + gp.player.screenY;
     }
+
+    // Handle the entity's dying animation. Encap
+    private boolean soundPlayed = false; // Flag to ensure sound plays once
     
-    private boolean soundPlayed = false; // Add a flag to track sound playback
+ 
 
     public void dyingAnimation(Graphics2D g2) {
         dyingCounter++;
@@ -285,14 +301,14 @@ public class Entity {
             alive = false;
         }
 
-        // Play sound only once
+        // Play death sound once
         if (!soundPlayed) {
             gp.playSE(8);
-            soundPlayed = true; // Set the flag to true after playing the sound
+            soundPlayed = true;
         }
     }
 
-
+    // Load and scale images for sprites
     public BufferedImage setup(String imagePath, int width, int height) {
         UtilityTool uTool = new UtilityTool();
         BufferedImage image = null;
@@ -304,37 +320,41 @@ public class Entity {
             e.printStackTrace();
         }
 
-        return image; // Ensure this is only called once during object initialization
+        return image;
     }
 
+    // Manage sprite animations
     private BufferedImage getSpriteImage(BufferedImage img1, BufferedImage img2, BufferedImage img3) {
-        // If the entity is static (like the door), don't animate
+        // Return the static image if the entity doesn't animate
         if (isStatic) {
-            return img1; // Always use the first image for static objects
+            return img1;
         }
 
-        // Manage sprite animation here (for moving entities like NPCs)
+        // Increment sprite counter and cycle through frames
         spriteCounter++;
-        if (spriteCounter > 25) { // Change this value to adjust the speed of sprite change
+        if (spriteCounter > 25) {
             spriteCounter = 0;
             spriteNum++;
             if (spriteNum > 3) {
                 spriteNum = 1;
             }
         }
-        
-        if (invincible == true) {
+
+        // Reset invincibility after a duration
+        if (invincible) {
             invincibleCounter++;
             if (invincibleCounter > 40) {
                 invincible = false;
                 invincibleCounter = 0;
             }
         }
+
+        // Increase cooldown for projectile shots
         if (shotAvailableCounter < 30) {
-        	shotAvailableCounter++;
+            shotAvailableCounter++;
         }
 
-
+        // Return the current frame based on spriteNum
         switch (spriteNum) {
             case 1:
                 return img1;

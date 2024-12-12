@@ -93,6 +93,8 @@ public class EventHandler {
                 healingPool(gp.dialogueState);
             }	
             
+            
+            
             //rock dialogue
             if (rockBlockCooldown) {
                 rockBlockCooldownCounter++;

@@ -16,7 +16,7 @@ public class MON_AdikEye extends Entity {
         type = type_monster; // Assuming a new type for AdikEye
         name = "Adik Eye";
         speed = 1; // Slightly faster than Red Slime
-        maxLife = 5; // More life than Red Slime
+        maxLife = 7; // More life than Red Slime
         life = maxLife;
         exp = 2;
         projectile = new OBJ_Eyeatk(gp);

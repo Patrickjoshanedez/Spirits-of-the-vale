@@ -18,7 +18,7 @@ public class Sound {
 	float volume;
 	
 	public Sound() {
-		
+		//Array
 		soundURL[0] = getClass().getResource("/sound/EXPLORING.wav");
 		soundURL[1] = getClass().getResource("/sound/dooropen.wav");
 		soundURL[2] = getClass().getResource("/sound/powerup.wav");
@@ -31,6 +31,8 @@ public class Sound {
 		soundURL[9] = getClass().getResource("/sound/SIPPING.wav");
 		soundURL[10] = getClass().getResource("/sound/cursor_sound.wav");
 		soundURL[11] = getClass().getResource("/sound/potion.wav");
+		soundURL[11] = getClass().getResource("/sound/gameover.wav");
+		
 	}
 	
 	public void setFile(int i) {

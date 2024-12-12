@@ -157,7 +157,6 @@ public class CollisionChecker {
         return index; // Return index of the colliding target or 999 if no collision
     }
 
-
     public boolean checkPlayer(Entity entity) {
     	
     	boolean contactPlayer = false;

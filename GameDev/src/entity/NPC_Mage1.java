@@ -32,8 +32,8 @@ public class NPC_Mage1 extends Entity{
 	public void setDialogue() {
 		
 		dialogue[0] = "Greetings, dear warrior!";
-		dialogue[1] = "I'm the chief in this side of \ntown HAHAHAHAHAHAHAHA";
-		dialogue[2] = "Welcome to our village!!";
+		dialogue[1] = "I'm the chief in this side of town\n";
+		dialogue[2] = "Please help our village!!";
 
 	}
 
