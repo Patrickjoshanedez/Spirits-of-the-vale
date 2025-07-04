@@ -1,4 +1,4 @@
-Spirits of the vale is inspired by games like pokemon, finalfantasy, and zelda games
+Spirits of the vale is inspired by games like zelda games
 
 -It has a unique story
 -npc's (with basic A.I)
